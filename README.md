@@ -2,8 +2,6 @@
 
 Personal Claude Code skills collection.
 
-The **question-time** skill is inspired by [grill-me](https://github.com/mattpocock/skills/tree/main/grill-me) by [Matt Pocock](https://github.com/mattpocock).
-
 ## Install
 
 ```bash
@@ -16,7 +14,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 
 | Skill | Description |
 |-------|-------------|
-| [question-time](./question-time) | Relentless Socratic interrogation of plans and designs |
+| [question-time](./question-time) | Relentless Socratic interrogation of plans and designs. Inspired by [grill-me](https://github.com/mattpocock/skills/tree/main/grill-me) by [Matt Pocock](https://github.com/mattpocock). |
 
 ### Architecture Knowledge
 
