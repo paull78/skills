@@ -2,6 +2,8 @@
 
 Personal Claude Code skills collection.
 
+The **question-time** skill is inspired by [grill-me](https://github.com/mattpocock/skills/tree/main/grill-me) by [Matt Pocock](https://github.com/mattpocock).
+
 ## Install
 
 ```bash
