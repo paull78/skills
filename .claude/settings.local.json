@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm view:*)",
+      "Bash(xargs cat:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(xargs ls:*)",
+      "Bash(git init:*)",
+      "Bash(git branch:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh auth:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
