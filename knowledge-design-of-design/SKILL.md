@@ -1,6 +1,6 @@
 ---
 name: knowledge-design-of-design
-description: Architecture knowledge from Fred Brooks' "The Design of Design." Use as a grilling lens when evaluating the design process itself — how decisions are made, what constraints are honored, and whether the designer is being honest about tradeoffs.
+description: Architecture knowledge from Fred Brooks' "The Design of Design." Use as a challenge lens when evaluating the design process itself — how decisions are made, what constraints are honored, and whether the designer is being honest about tradeoffs.
 ---
 
 # The Design of Design — Fred Brooks
@@ -34,7 +34,7 @@ Design is not a linear process. It is iterative, exploratory, and driven by cons
 - Optimizing before understanding the problem space.
 - Treating all requirements as equal.
 
-## Grilling Questions
+## Challenge Questions
 
 - Who owns the conceptual integrity of this design?
 - What constraints are you working within? Have you listed them?

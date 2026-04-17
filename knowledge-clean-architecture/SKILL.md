@@ -1,6 +1,6 @@
 ---
 name: knowledge-clean-architecture
-description: Architecture knowledge from Robert C. Martin's Clean Architecture and SOLID principles. Use as a grilling lens when evaluating designs for dependency management, separation of concerns, and component boundaries.
+description: Architecture knowledge from Robert C. Martin's Clean Architecture and SOLID principles. Use as a challenge lens when evaluating designs for dependency management, separation of concerns, and component boundaries.
 ---
 
 # Clean Architecture — Robert C. Martin
@@ -33,7 +33,7 @@ description: Architecture knowledge from Robert C. Martin's Clean Architecture a
 - Shared mutable state crossing boundaries.
 - "God" modules with multiple reasons to change.
 
-## Grilling Questions
+## Challenge Questions
 
 - Where does this dependency point — toward policy or toward detail?
 - If the database changes, what breaks?

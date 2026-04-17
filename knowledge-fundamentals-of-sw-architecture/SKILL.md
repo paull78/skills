@@ -1,6 +1,6 @@
 ---
 name: knowledge-fundamentals-of-sw-architecture
-description: Architecture knowledge from Richards & Ford's "Fundamentals of Software Architecture." Use as a grilling lens when evaluating architecture characteristics, component design, topology choices, and fitness functions.
+description: Architecture knowledge from Richards & Ford's "Fundamentals of Software Architecture." Use as a challenge lens when evaluating architecture characteristics, component design, topology choices, and fitness functions.
 ---
 
 # Fundamentals of Software Architecture — Richards & Ford
@@ -44,7 +44,7 @@ Choose topology based on characteristics, not fashion:
 - Examples: dependency direction tests, performance budgets, cyclic dependency detection, deployment frequency metrics.
 - Architecture without fitness functions will erode.
 
-## Grilling Questions
+## Challenge Questions
 
 - What are the top 3 architecture characteristics this system must support? Are you trying to support too many?
 - What tradeoff are you making with this choice, and is it explicit?

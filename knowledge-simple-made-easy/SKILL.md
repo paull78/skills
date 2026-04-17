@@ -1,6 +1,6 @@
 ---
 name: knowledge-simple-made-easy
-description: Architecture knowledge from Rich Hickey's "Simple Made Easy" talk. Use as a grilling lens when evaluating designs for accidental complexity, complecting, and whether "easy" choices are hiding future pain.
+description: Architecture knowledge from Rich Hickey's "Simple Made Easy" talk. Use as a challenge lens when evaluating designs for accidental complexity, complecting, and whether "easy" choices are hiding future pain.
 ---
 
 # Simple Made Easy — Rich Hickey
@@ -42,7 +42,7 @@ Common complections:
 - Ease of understanding now trades against ease of change later.
 - "I can rewrite it in two weeks" is not simplicity — it's familiarity.
 
-## Grilling Questions
+## Challenge Questions
 
 - What is being complected here that could be kept separate?
 - Is this choice simple, or just familiar?

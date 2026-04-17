@@ -1,6 +1,6 @@
 ---
 name: question-time
-description: Relentless Socratic interrogation of plans and designs. Challenges every assumption, resolves every branch of the decision tree. Optionally grills against repository architecture and loaded architecture-knowledge skills. Use when user wants to stress-test a plan, validate a design, or mentions "question time" or "grill me".
+description: Relentless Socratic interrogation of plans and designs. Challenges every assumption, resolves every branch of the decision tree. Optionally evaluates against repository architecture and loaded architecture-knowledge skills. Use when user wants to stress-test a plan, validate a design, or mentions "question time".
 ---
 
 # Question Time
@@ -13,9 +13,9 @@ Interrogate the user's plan or design relentlessly. Challenge every assumption. 
    - Broad: divergent questioning — surface missing concerns, unexplored tradeoffs, unstated assumptions.
    - Detailed: convergent questioning — probe gaps, ordering issues, failure modes, missing steps.
 
-2. Ask: **"Do you want me to grill against repository architecture and/or include any specific architecture knowledge?"**
+2. Ask: **"Do you want me to challenge against repository architecture and/or include any specific architecture knowledge?"**
    - **Repo architecture:** scan CLAUDE.md, folder structure, config, conventions. Dive deeper into specific code areas only when they become relevant during questioning.
-   - **Architecture knowledge:** list installed architecture-knowledge skills by name. Then ask if there's anything else not in the list to grill against.
+   - **Architecture knowledge:** list installed architecture-knowledge skills by name. Then ask if there's anything else not in the list to evaluate against.
    - Both are optional and independent.
 
 ## Questioning

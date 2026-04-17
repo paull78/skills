@@ -18,7 +18,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 
 ### Architecture Knowledge
 
-Composable lenses for grilling designs against established principles. Use standalone or loaded by question-time.
+Composable lenses for challenging designs against established principles. Use standalone or loaded by question-time.
 
 | Skill | Source |
 |-------|--------|

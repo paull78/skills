@@ -1,6 +1,6 @@
 ---
 name: knowledge-pattern-language
-description: Architecture knowledge from Christopher Alexander's "A Pattern Language." Use as a grilling lens when evaluating designs for human-centered structure, emergent wholeness, and whether patterns connect to form a living system rather than a dead assembly.
+description: Architecture knowledge from Christopher Alexander's "A Pattern Language." Use as a challenge lens when evaluating designs for human-centered structure, emergent wholeness, and whether patterns connect to form a living system rather than a dead assembly.
 ---
 
 # A Pattern Language — Christopher Alexander
@@ -36,7 +36,7 @@ When evaluating a design, ask for each decision:
 - Over-specifying structure instead of allowing it to emerge from use.
 - Designing for the designer's aesthetics rather than the inhabitant's (user's) experience.
 
-## Grilling Questions
+## Challenge Questions
 
 - What forces are in tension here, and how does this design resolve them?
 - Do these patterns connect into a coherent language, or are they isolated choices?

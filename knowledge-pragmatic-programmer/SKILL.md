@@ -1,6 +1,6 @@
 ---
 name: knowledge-pragmatic-programmer
-description: Architecture knowledge from Hunt & Thomas' "The Pragmatic Programmer." Use as a grilling lens when evaluating designs for practical engineering discipline — DRY, orthogonality, reversibility, and tracer bullets.
+description: Architecture knowledge from Hunt & Thomas' "The Pragmatic Programmer." Use as a challenge lens when evaluating designs for practical engineering discipline — DRY, orthogonality, reversibility, and tracer bullets.
 ---
 
 # The Pragmatic Programmer — Hunt & Thomas
@@ -29,7 +29,7 @@ description: Architecture knowledge from Hunt & Thomas' "The Pragmatic Programme
 - Assuming decisions are permanent.
 - Programming by coincidence — it works but you don't know why.
 
-## Grilling Questions
+## Challenge Questions
 
 - Is this knowledge represented in exactly one place?
 - If this decision turns out to be wrong, how hard is it to reverse?
