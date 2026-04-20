@@ -86,6 +86,12 @@ Mark each step done as soon as completed.
 - [ ] All existing tests still pass
 - [ ] New tests pass (if TDD)
 - [ ] No unintended side effects on other modules
+
+## Quick Test Quality Check
+
+- [ ] Tests assert on behavior (outputs, side effects), not implementation details
+- [ ] Tests cover at least one edge case or error path, not just the happy path
+- [ ] A valid refactor would not break these tests
 ```
 
 ## Large Task File — Session Split
