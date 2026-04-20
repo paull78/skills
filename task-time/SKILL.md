@@ -11,6 +11,17 @@ Break a PRD into independent task files that can all be executed in parallel.
 
 **One task file = one independent unit of work.** All task files can run concurrently with no cross-file dependencies. If steps depend on each other, they belong in the same file. The only task that depends on all others is the final reconciliation task.
 
+## Splitting Strategy
+
+**Prefer vertical slices.** Each task should be a thin, complete path through all layers it touches (schema, logic, API, UI, tests) for one narrow capability — not a horizontal layer done in full.
+
+**Validate independence with these checks:**
+- **File exclusivity:** no two concurrent tasks write to the same file
+- **Interface stability:** the task doesn't change contracts that other tasks depend on
+- **Bounded scope:** you can state in one sentence which files/modules the task modifies
+
+**Optional — tracer bullet task:** For larger PRDs, consider making task-01 a thin end-to-end skeleton that establishes interfaces and contracts. Subsequent tasks then build against those stable interfaces. Skip this for small/medium PRDs where it would be overhead.
+
 ## Input
 
 Read the PRD from `plans/<project-name>.md`. If no PRD is specified, ask the user which one to use.
@@ -52,6 +63,10 @@ Extracted from the PRD — only the criteria relevant to this task.
 
 - [ ] criterion 1
 - [ ] criterion 2
+
+## Scope
+
+Files and modules this task may modify. (Optional — include for larger PRDs to prevent conflicts between parallel tasks.)
 
 ## Approach
 
