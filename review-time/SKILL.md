@@ -46,22 +46,31 @@ Either:
    - Does the implementation match the PRD acceptance criteria?
    - Does it respect the specified architecture patterns?
 
+   **Compute environment variables first:**
+   ```bash
+   BRANCH=$(git branch --show-current)
+   BASE=$(git merge-base HEAD main)
+   REPO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+   DIFF=$(git diff "$BASE"..HEAD)
+   PR_NUMBER=$(gh pr list --head "$BRANCH" --json number --jq '.[0].number')
+   ```
+
    **Agent invocation:**
 
    - **Claude (self):** Review the diff directly — you are already Claude.
 
    - **Codex:**
      ```bash
-     codex exec --full-auto --output-last-message /tmp/codex-review.md "Review the code changes on this branch compared to the base branch. Run: git diff $(git merge-base HEAD master)..HEAD to see the changes. Focus on bugs, logic errors, edge cases, security, architecture, and code quality. Output a structured review with file:line references."
+     codex exec --full-auto --output-last-message /tmp/codex-review.md "Review the code changes on this branch. Run: git diff $BASE..HEAD to see the changes. Focus on bugs, logic errors, edge cases, security, architecture, and code quality. Output a structured review with file:line references."
      ```
 
-   - **Copilot (via PR):** If a PR exists or can be created as draft:
+   - **Copilot (via PR):** If `$PR_NUMBER` is set:
      ```bash
-     gh pr edit <PR_NUMBER> --add-reviewer @copilot
+     gh pr edit "$PR_NUMBER" --add-reviewer @copilot
      ```
      Poll for Copilot's review (may take up to 5 minutes):
      ```bash
-     gh api "repos/{owner}/{repo}/pulls/<PR_NUMBER>/comments" --jq '.[] | select(.user.login | test("copilot"; "i")) | {path, line, body}'
+     gh api "repos/$REPO/pulls/$PR_NUMBER/comments" --jq '.[] | select(.user.login | test("copilot"; "i")) | {path, line, body}'
      ```
      If no PR exists and user doesn't want one created, skip Copilot.
 
