@@ -18,6 +18,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 | [prd-time](./prd-time) | PRD creation with architecture selection, codebase exploration, and relentless questioning. Inspired by [write-a-prd](https://github.com/mattpocock/skills/tree/main/write-a-prd) by [Matt Pocock](https://github.com/mattpocock). |
 | [task-time](./task-time) | Break a PRD into independent, parallelizable task files with TDD where appropriate and a final reconciliation task. |
 | [test-verify-time](./test-verify-time) | Full test quality assessment after all tasks complete — checks behavior focus, edge cases, pyramid balance, independence, and brittleness. |
+| [review-time](./review-time) | Multi-agent code review — dispatches diff to Claude, Codex, Copilot in parallel, aggregates findings with consensus scoring. |
 
 ### Architecture Knowledge
 
