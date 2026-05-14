@@ -19,6 +19,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 | [task-time](./task-time) | Break a PRD into independent, parallelizable task files with TDD where appropriate and a final reconciliation task. |
 | [test-verify-time](./test-verify-time) | Full test quality assessment after all tasks complete — checks behavior focus, edge cases, pyramid balance, independence, and brittleness. |
 | [review-time](./review-time) | Multi-agent code review — dispatches diff to Claude, Codex, Copilot in parallel, aggregates findings with consensus scoring. |
+| [comment-time](./comment-time) | Audit comments for necessity, brevity, non-triviality, clarity, accuracy, and rot. Scope: repo, branch diff, changed files, or current file. |
 
 ### Architecture Knowledge
 
