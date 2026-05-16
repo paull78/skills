@@ -20,6 +20,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 | [test-verify-time](./test-verify-time) | Full test quality assessment after all tasks complete — checks behavior focus, edge cases, pyramid balance, independence, and brittleness. |
 | [review-time](./review-time) | Multi-agent code review — dispatches diff to Claude, Codex, Copilot in parallel, aggregates findings with consensus scoring. |
 | [comment-time](./comment-time) | Audit comments for necessity, brevity, non-triviality, clarity, accuracy, and rot. Scope: repo, branch diff, changed files, or current file. |
+| [explain-time](./explain-time) | Write a top-down explanatory document about a system or subsystem for a reader who knows code but not the domain. Jargon defined inline, real walk-throughs, file:line citations, glossary. |
 
 ### Architecture Knowledge
 
