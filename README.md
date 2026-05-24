@@ -21,6 +21,7 @@ npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
 | [review-time](./review-time) | Multi-agent code review — dispatches diff to Claude, Codex, Copilot in parallel, aggregates findings with consensus scoring. |
 | [comment-time](./comment-time) | Audit comments for necessity, brevity, non-triviality, clarity, accuracy, and rot. Scope: repo, branch diff, changed files, or current file. |
 | [explain-time](./explain-time) | Write a top-down explanatory document about a system or subsystem for a reader who knows code but not the domain. Jargon defined inline, real walk-throughs, file:line citations, glossary. |
+| [save-time](./save-time) | Write a markdown recap of the current conversation so the work can be resumed later. Captures decisions and their rationale, plans in flight, gotchas, pitfalls, and where things stand. Omits anything obvious from the code or git history. |
 
 ### Architecture Knowledge
 
