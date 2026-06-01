@@ -1,0 +1,27 @@
+{
+  "skill_name": "test-time",
+  "notes": "Mode A (write) cases point at a single source file; Mode B (evaluate/improve) points at code plus a deliberately weak existing test file. All three fixtures are verified correct (no planted bugs) — the point is to grade whether the skill writes aggressive tests, not whether it finds a specific bug. rle.py caps a run at 255 and starts a fresh run for the rest, so the 255/256-byte boundary is the natural region for guided fuzzing and corner-case tests (and where a strong round-trip property test would catch any future off-by-one). Use these to check whether the skill reaches for round-trip invariants, guided fuzzing, reference oracles, corner cases at thresholds, and malformed-input tests rather than a few happy-path examples.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "write-codec-tests",
+      "prompt": "Write a test set for the run-length encoding codec at /Users/paolo/code/personal/skills/test-time/evals/fixtures/rle.py. Put the tests in a file next to it.",
+      "expected_output": "A test file that goes well beyond happy-path examples: a round-trip invariant (decode(encode(x)) == x) driven by seeded random/fuzzed byte inputs, with the seed and failing input reported on failure; guided inputs that oversample long runs and high-repeat data (not just uniform noise) so the 255/256-byte run boundary is exercised — explicit tests at runs of 254, 255, 256, 257; malformed-input handling (e.g. odd-length / truncated streams raising ValueError); empty input; and ideally a mutation-check note confirming a deliberately broken encoder turns a test red. Should test through encode/decode (the public API), not internals.",
+      "files": ["fixtures/rle.py"]
+    },
+    {
+      "id": 2,
+      "name": "write-invariant-tests",
+      "prompt": "Write tests for the interval-merge function at /Users/paolo/code/personal/skills/test-time/evals/fixtures/merge_intervals.py. Put the tests in a file next to it.",
+      "expected_output": "A property-based test set that asserts invariants over randomized interval lists rather than memorized outputs: output is sorted by start, output intervals are non-overlapping, and output covers exactly the same set of integer points as the input (a reference oracle built from a Python set of covered points is the natural way to check this). Corner cases: empty list, single interval, fully nested intervals, intervals touching exactly at an endpoint (adjacency), duplicates, large random batches (light stress). Seeded randomness with the failing case reported on failure.",
+      "files": ["fixtures/merge_intervals.py"]
+    },
+    {
+      "id": 3,
+      "name": "evaluate-and-improve-lru",
+      "prompt": "Evaluate the tests in /Users/paolo/code/personal/skills/test-time/evals/fixtures/test_lru_cache_weak.py for the LRU cache at /Users/paolo/code/personal/skills/test-time/evals/fixtures/lru_cache.py. They feel thin. Tell me where they're weak and strengthen them.",
+      "expected_output": "A diagnosis that names the concrete weaknesses (happy-path/fixed-data only, exact-output assertions, no randomization, no reference oracle, no get-promotes-to-MRU eviction-ordering test, no update-existing-key behavior, no capacity=1 / capacity boundary, no stress with many mixed operations) followed by added tests that actually fix them: a reference-oracle test running a long randomized sequence of get/put operations against a simple model of the LRU policy and asserting agreement; eviction-ordering tests where get() changes who gets evicted; update-existing-key keeps len stable; corner cases (capacity 1); seeded randomness. Should prefer adding tests over only listing recommendations, and ideally include a mutation check.",
+      "files": ["fixtures/lru_cache.py", "fixtures/test_lru_cache_weak.py"]
+    }
+  ]
+}
