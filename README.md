@@ -4,8 +4,16 @@ Personal Claude Code skills collection.
 
 ## Install
 
+Uses the [`skills`](https://github.com/vercel-labs/skills) CLI.
+
 ```bash
-npx @anthropic-ai/claude-code-skills install github:paull78/skills/<skill-name>
+npx skills add paull78/skills --skill <skill-name> --global
+```
+
+Drop `--global` to install into the current project instead. To see what is available:
+
+```bash
+npx skills add paull78/skills --list
 ```
 
 ## Skills
