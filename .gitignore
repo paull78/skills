@@ -1,2 +1,3 @@
 *-workspace/
 evals/
+.claude/settings.local.json
