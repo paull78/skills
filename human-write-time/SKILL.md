@@ -213,6 +213,30 @@ Describing a thing by what changed instead of what it is. "This function was add
 - **Curly quotes** when the platform did not generate them. Use straight quotes.
 - Hyphenated pairs stay hyphenated attributively ("a cross-functional team") and lose the hyphen predicatively ("the team is cross functional").
 
+## 21. Fragment-question pivots and stage cues
+
+A one-word question standing alone to set up its own answer: "The result?" "The catch?" "The problem?" "The kicker?" "The best part?" "Why?" A bare "How?" on its own line. These manufacture suspense for information that needed none.
+
+Same family, the stage cue that announces an arrival: "Enter Lockstep." "Cue the rewrite." "Spoiler: it doesn't."
+
+Delete the setup and state the thing. "The result? Builds got faster." becomes "Builds got faster."
+
+---
+
+# Structural tells
+
+The rules above catch AI-shaped sentences. These catch AI-shaped documents, where every paragraph is clean and the piece still reads as generated.
+
+- **Preview and recap frame.** An intro announcing what the piece will cover, and a conclusion restating it. Cut both. Start with the first real thing, end with the last real thing. HARD.
+- **A takeaway on every section.** Each section closing with a one-line lesson. Most sections should just stop. HARD.
+- **Symmetric sections.** Every section the same length, each with the same number of subpoints. Real writing is lopsided, because the author cared more about some parts. STRONG.
+- **Uniform paragraph architecture.** Every paragraph built topic sentence, then support, then transition. Individually fine, collectively a fingerprint. STRONG.
+- **Question headings.** "What is X?" "Why does it matter?" "How do I get started?" The FAQ skeleton wrapped around something that is not an FAQ. STRONG.
+- **Forced balance.** Equal weight to pros and cons regardless of which is actually true, because even-handedness reads as safe. If one side is right, say so. STRONG.
+- **Imposed listicle.** "5 ways to X" when the piece is one argument that got chopped into 5. STRONG.
+
+When the shape is the problem, fixing sentences will not help. Restructure first, then de-slop the prose.
+
 ---
 
 # STRONG tendencies
@@ -248,6 +272,34 @@ Removing tells leaves clean, lifeless prose unless something replaces them.
 - **Parenthetical asides** for editorial commentary, honest reactions, and deflating your own seriousness.
 - **Write lopsided.** One point gets four paragraphs, another gets a clause. Even weighting across sections is a machine habit.
 - **Leave tension unresolved** where it is unresolved. Not every section needs a takeaway.
+
+---
+
+# Worked example
+
+**Source:**
+
+> In today's fast-paced development landscape, managing dependencies isn't just a chore, it's a
+> critical bottleneck that can make or break your team's velocity. That's why we're thrilled to
+> announce Lockstep, a groundbreaking new tool that revolutionizes how teams handle package
+> updates. Lockstep serves as a comprehensive solution, seamlessly integrating with your existing
+> workflow while providing unparalleled visibility into your dependency tree. The result? Teams
+> report shipping faster, with fewer conflicts and greater confidence. Exciting times lie ahead.
+
+**Rewrite:**
+
+> Dependency updates are the slowest part of our week, so we built Lockstep.
+>
+> It reads the lockfile you already have, so there is nothing to migrate. And it flags which
+> packages actually changed behavior, instead of just which ones changed version numbers.
+>
+> We have been running it internally and conflicts are down.
+
+What that fixed, in order of appearance: "in today's" opener, negative parallelism ("isn't just a chore, it's a bottleneck"), "landscape" as abstraction, "thrilled to announce", "groundbreaking", "revolutionizes", copula avoidance ("serves as"), "seamlessly", "unparalleled", the fragment-question pivot ("The result?"), a rule of three ("faster, fewer conflicts, greater confidence"), and a generic upbeat close.
+
+**The part that matters most.** The source claims "teams report shipping faster" with nothing behind it. The obvious rewrite is "conflicts dropped 40%", which reads far better and is a fabrication. There was no 40% in the source. So the rewrite keeps the weak claim weak: "conflicts are down."
+
+When a vague sentence has no facts under it, you have three moves. Keep it vague, cut it, or ask the author for the real number. Inventing one is never on the list, however much better it reads.
 
 ---
 
