@@ -131,6 +131,8 @@ Delete the phrase. If the analysis is real, it earns its own sentence with a spe
 
 State the fact. Let the reader decide what it means.
 
+Same family, borrowed notability. A sentence whose only job is to establish that the subject matters: press logos recited in a row, follower counts, funding totals, award lists, "as featured in," "trusted by teams at." Keep the ones a reader needs. Cut the ones that are there to impress, and never assemble a list of them to open a piece.
+
 ## 7. False ranges
 
 "From ancient traditions to modern innovations." "From startups to enterprises." If you cannot name meaningful middle ground between the two poles, the range is decorative. Delete it, or list the specific things.
@@ -319,6 +321,8 @@ Over-editing is the failure mode that ruins human writing. These are not tells o
 
 **The cluster rule.** One isolated tell is not a finding. Look for clusters. Three of these in a paragraph means something. One of them in a page means a person wrote a sentence.
 
+**The date check.** ChatGPT opened to the public on 30 November 2022. Text written before that was written by a person, whatever it looks like. If the source is dated, or quoted from something dated, check the date before diagnosing anything. Older prose is full of these patterns because models learned them from somewhere, and the somewhere was us. In audit mode this outranks every rule above: say the text predates the tooling and leave it alone.
+
 # Preserve on sight
 
 Leave these alone even when they look irregular. They are the evidence a person was here.
@@ -336,7 +340,9 @@ Preserve the information, not the shape.
 
 Every claim, name, number, date, quotation, and citation in the source survives the rewrite. When preserving information and improving prose pull in opposite directions, information wins. Never add a fact, a source, or a detail that was not there. A fabrication is a defect even when it reads more human than the vague sentence it replaced.
 
-Compressing a dull passage is allowed. Dwelling where a person would naturally dwell is allowed. Inventing is not.
+Compressing a dull passage is allowed. Dwelling where a person would naturally dwell is allowed. Reordering paragraphs, merging sections, and cutting a heading are allowed, because the shape is usually where the machine left its prints. Inventing is not.
+
+What survives reordering is the hierarchy. If the source treats one point as the main event and another as an aside, that ranking holds in the rewrite even when the paragraphs move. Promoting a minor point to the top because it makes a better opening changes the argument, and that counts as changing the meaning.
 
 ---
 
