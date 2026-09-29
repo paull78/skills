@@ -262,7 +262,7 @@ LAST=""
 ACCEPT="I'll take your recommendation."
 ACCEPT_OK="Yes, OK. I'll take your recommendation."
 FINISH_SPEC="I'll take your recommendation. If you think the spec covers everything: it's done, skip the challenge round, and I approve it."
-AUTOPILOT="Yes. Take your recommendation. Whatever you are asking me to approve (outline, spec, plan, gate, consolidation) is approved; use sequential mode; manual checks are confirmed; merge rather than rebase; no lessons to promote; pins are done with."
+AUTOPILOT="Yes. Take your recommendation. Whatever you are asking me to approve (outline, spec, plan, gate, consolidation) is approved; use sequential mode; manual checks are confirmed; to bring the branch up to date, merge the default branch into it; never merge the feature branch into the default branch, I do that myself; no lessons to promote; pins are done with."
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 pass() { echo "PASS: $*"; }
@@ -1621,7 +1621,7 @@ start_cycle() { # slug, description
   git switch -q main
   reset_session
   turn "/project-time new cycle, slug $1: $2 Keep it to one milestone with at most two steps."
-  drive 'grep -q "Status: approved" docs/current/plan/INDEX.md 2>/dev/null' "$AUTOPILOT" 25
+  drive 'grep -q "Status: approved" docs/current/plan/INDEX.md 2>/dev/null' "$AUTOPILOT Stop right after the gate 1 commit; don't start building." 25
 }
 finish_cycle() { # slug
   assert_clean_tree

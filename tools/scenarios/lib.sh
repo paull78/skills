@@ -20,7 +20,7 @@ LAST=""
 ACCEPT="I'll take your recommendation."
 ACCEPT_OK="Yes, OK. I'll take your recommendation."
 FINISH_SPEC="I'll take your recommendation. If you think the spec covers everything: it's done, skip the challenge round, and I approve it."
-AUTOPILOT="Yes. Take your recommendation. Whatever you are asking me to approve (outline, spec, plan, gate, consolidation) is approved; use sequential mode; manual checks are confirmed; merge rather than rebase; no lessons to promote; pins are done with."
+AUTOPILOT="Yes. Take your recommendation. Whatever you are asking me to approve (outline, spec, plan, gate, consolidation) is approved; use sequential mode; manual checks are confirmed; to bring the branch up to date, merge the default branch into it; never merge the feature branch into the default branch, I do that myself; no lessons to promote; pins are done with."
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 pass() { echo "PASS: $*"; }
