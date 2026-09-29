@@ -32,7 +32,29 @@ def test_colon_space_in_description_is_rejected(tmp_path):
 
 def test_quoted_colon_space_is_still_rejected(tmp_path):
     errors = check_skill(make_skill(tmp_path, description='"Does things: many of them."'))
-    assert any("': '" in e for e in errors)
+    assert errors
+
+
+def test_block_scalar_description_is_rejected(tmp_path):
+    d = tmp_path / "demo"
+    d.mkdir()
+    (d / "SKILL.md").write_text(
+        "---\nname: demo\ndescription: >\n  Does things: many of them.\n---\n\n# Demo\n",
+        encoding="utf-8",
+    )
+    errors = check_skill(d)
+    assert any("single-line plain scalar" in e for e in errors)
+
+
+def test_wrapped_quoted_description_is_rejected(tmp_path):
+    d = tmp_path / "demo"
+    d.mkdir()
+    (d / "SKILL.md").write_text(
+        '---\nname: demo\ndescription: "Does things\n  well: nicely."\n---\n\n# Demo\n',
+        encoding="utf-8",
+    )
+    errors = check_skill(d)
+    assert any("single-line plain scalar" in e for e in errors)
 
 
 def test_space_hash_in_description_is_rejected(tmp_path):

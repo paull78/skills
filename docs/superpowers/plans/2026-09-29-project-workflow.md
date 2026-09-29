@@ -79,7 +79,29 @@ def test_colon_space_in_description_is_rejected(tmp_path):
 
 def test_quoted_colon_space_is_still_rejected(tmp_path):
     errors = check_skill(make_skill(tmp_path, description='"Does things: many of them."'))
-    assert any("': '" in e for e in errors)
+    assert errors
+
+
+def test_block_scalar_description_is_rejected(tmp_path):
+    d = tmp_path / "demo"
+    d.mkdir()
+    (d / "SKILL.md").write_text(
+        "---\nname: demo\ndescription: >\n  Does things: many of them.\n---\n\n# Demo\n",
+        encoding="utf-8",
+    )
+    errors = check_skill(d)
+    assert any("single-line plain scalar" in e for e in errors)
+
+
+def test_wrapped_quoted_description_is_rejected(tmp_path):
+    d = tmp_path / "demo"
+    d.mkdir()
+    (d / "SKILL.md").write_text(
+        '---\nname: demo\ndescription: "Does things\n  well: nicely."\n---\n\n# Demo\n',
+        encoding="utf-8",
+    )
+    errors = check_skill(d)
+    assert any("single-line plain scalar" in e for e in errors)
 
 
 def test_space_hash_in_description_is_rejected(tmp_path):
@@ -139,6 +161,7 @@ def check_skill(skill_dir):
     path = skill_dir / "SKILL.md"
     if not path.is_file():
         return [f"{skill_dir}: missing SKILL.md"]
+    # read_text() translates CRLF to LF, which the split on "---\n" relies on.
     text = path.read_text(encoding="utf-8")
     parts = text.split("---\n", 2)
     if len(parts) != 3 or parts[0] != "":
@@ -154,10 +177,13 @@ def check_skill(skill_dir):
     if meta.get("name") != skill_dir.name:
         errors.append(f"{path}: name {meta.get('name')!r} does not match folder {skill_dir.name!r}")
     raw = _raw_description(parts[1])
-    if not raw:
-        errors.append(f"{path}: description missing")
-    else:
-        # Checked on the raw line: YAML silently drops a " #" comment tail.
+    parsed_description = meta.get("description")
+    # Require a single-line plain scalar so the raw text we check is the
+    # whole description: a block scalar or a wrapped quoted string would
+    # otherwise let ": " or " #" hide on a line we never look at.
+    if not raw or raw[0] in ">|\"'" or raw != parsed_description:
+        errors.append(f"{path}: description must be a single-line plain scalar")
+    if raw:
         if ": " in raw:
             errors.append(f"{path}: description contains ': ', which breaks the skills installer")
         if " #" in raw:
@@ -186,7 +212,7 @@ if __name__ == "__main__":
 - [ ] **Step 4: Run the tests to verify they pass**
 
 Run: `uv run --with pyyaml --with pytest pytest -q tools/test_check_skills.py`
-Expected: `8 passed`
+Expected: `10 passed`
 
 - [ ] **Step 5: Run the checker on the existing skills**
 
@@ -1712,7 +1738,7 @@ done
 - [ ] **Step 3: Run the full static check**
 
 Run: `uv run --with pyyaml python tools/check_skills.py project-time project-spec project-plan project-build project-wrap && uv run --with pyyaml --with pytest pytest -q tools/test_check_skills.py`
-Expected: `ok: 5 skill(s)` and `8 passed`
+Expected: `ok: 5 skill(s)` and `10 passed`
 
 - [ ] **Step 4: Check the installer sees the skills**
 

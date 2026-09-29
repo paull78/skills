@@ -26,6 +26,7 @@ def check_skill(skill_dir):
     path = skill_dir / "SKILL.md"
     if not path.is_file():
         return [f"{skill_dir}: missing SKILL.md"]
+    # read_text() translates CRLF to LF, which the split on "---\n" relies on.
     text = path.read_text(encoding="utf-8")
     parts = text.split("---\n", 2)
     if len(parts) != 3 or parts[0] != "":
@@ -41,10 +42,13 @@ def check_skill(skill_dir):
     if meta.get("name") != skill_dir.name:
         errors.append(f"{path}: name {meta.get('name')!r} does not match folder {skill_dir.name!r}")
     raw = _raw_description(parts[1])
-    if not raw:
-        errors.append(f"{path}: description missing")
-    else:
-        # Checked on the raw line: YAML silently drops a " #" comment tail.
+    parsed_description = meta.get("description")
+    # Require a single-line plain scalar so the raw text we check is the
+    # whole description: a block scalar or a wrapped quoted string would
+    # otherwise let ": " or " #" hide on a line we never look at.
+    if not raw or raw[0] in ">|\"'" or raw != parsed_description:
+        errors.append(f"{path}: description must be a single-line plain scalar")
+    if raw:
         if ": " in raw:
             errors.append(f"{path}: description contains ': ', which breaks the skills installer")
         if " #" in raw:
