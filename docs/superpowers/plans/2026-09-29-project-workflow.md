@@ -998,16 +998,16 @@ source "$(dirname "$0")/lib.sh"
 from_snapshot plan-approved
 turn "/project-time"
 
-milestone_block 1 | grep -qE '^- \[( |~)\]' && fail "milestone 1 has unfinished steps"
-milestone_block 1 | grep -q 'gate pending' || fail "milestone 1 gate should still be pending"
-milestone_block 2 | grep -qE '^- \[x\]' && fail "build ran past the milestone 1 gate"
+milestone_block 1 | grep -E '^- \[( |~)\]' >/dev/null && fail "milestone 1 has unfinished steps"
+milestone_block 1 | grep 'gate pending' >/dev/null || fail "milestone 1 gate should still be pending"
+milestone_block 2 | grep -E '^- \[x\]' >/dev/null && fail "build ran past the milestone 1 gate"
 assert_commit '^wordfreq step 01'
 cmd="$(test_cmd)"; [ -n "$cmd" ] || fail "no Test: command"; eval "$cmd" || fail "tests fail at gate 1"
 assert_clean_tree
 pass "stopped at gate 1"
 
 turn "Gate approved, continue. Stop at the final gate; don't wrap."
-milestone_block 1 | grep -q 'gate passed' || fail "gate 1 not recorded as passed"
+milestone_block 1 | grep 'gate passed' >/dev/null || fail "gate 1 not recorded as passed"
 drive '[ -f docs/current/plan/INDEX.md ] && ! grep -qE "^- \[( |~)\]" docs/current/plan/INDEX.md' "Gate approved, continue. Stop at the final gate; don't wrap." 4
 cmd="$(test_cmd)"; [ -n "$cmd" ] || fail "no Test: command"; eval "$cmd" || fail "tests fail at the final gate"
 pass "reached the final gate"
@@ -1062,13 +1062,13 @@ turn "/project-time Only do step 01, then stop."
 step01="$(shasum docs/current/plan/step-01-*.md)"
 
 turn "Change of plan: add a --min-length N option that ignores words shorter than N. Also, pin this: the output stays plain text, never colours."
-drive 'git log --format=%s | grep -q "^wordfreq: plan updated"' "$ACCEPT_OK Stop after the plan update; don't continue building." 8
+drive 'git log --format=%s | grep "^wordfreq: plan updated" >/dev/null' "$ACCEPT_OK Stop after the plan update; don't continue building." 8
 
 assert_grep docs/current/spec.md '^## Amendments'
 assert_grep docs/current/spec.md 'min-length'
 grep -rqE '^### wordfreq\.[0-9]+ · pivot' docs/current/memory || fail "no pivot entry"
-awk '/^## Pinned/{p=1; next} /^## /{p=0} p' docs/current/memory/INDEX.md | grep -qiE 'plain.?text|colou?r|ansi' || fail "pin not in the cycle index"
-awk '/^## Notes/{p=1; next} p' docs/current/plan/INDEX.md | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2} · plan updated' || fail "no dated plan note"
+awk '/^## Pinned/{p=1; next} /^## /{p=0} p' docs/current/memory/INDEX.md | grep -iE 'plain.?text|colou?r|ansi' >/dev/null || fail "pin not in the cycle index"
+awk '/^## Notes/{p=1; next} p' docs/current/plan/INDEX.md | grep -E '[0-9]{4}-[0-9]{2}-[0-9]{2} · plan updated' >/dev/null || fail "no dated plan note"
 grep -lE 'min-length' docs/current/plan/step-*.md >/dev/null || fail "no step covers min-length"
 [ "$(shasum docs/current/plan/step-01-*.md)" = "$step01" ] || fail "a done step was rewritten"
 assert_commit '^wordfreq: spec amended'
@@ -1096,10 +1096,10 @@ assert_grep docs/current/plan/INDEX.md '\[x\] 02'
 assert_grep docs/current/plan/INDEX.md '\[x\] 03'
 python3 -m unittest -q || fail "tests fail after the merge"
 [ "$(git log --format=%s | grep -cE '^wordfreq step 0[23]')" -ge 2 ] || fail "missing step commits"
-for sha in $(git log --format=%H --grep '^wordfreq step 0[23]'); do
-  git show --name-only --format= "$sha" | grep -q '^docs/' && fail "step commit $sha touched docs/"
+for sha in $(git log --format=%H --grep '^wordfreq step 0[23]:'); do
+  git show --name-only --format= "$sha" | grep '^docs/' >/dev/null && fail "step commit $sha touched docs/"
 done
-assert_commit '^wordfreq steps? .*record progress'
+assert_commit '^wordfreq: record steps'
 assert_clean_tree
 pass "parallel"
 ```
@@ -1442,8 +1442,13 @@ for f in spec.md plan/INDEX.md memory/INDEX.md recap.md; do assert_file "$arch/$
 for h in 'What was built' 'How it went' 'Decisions that stand' 'Takeaways'; do assert_grep "$arch/recap.md" "^## $h"; done
 grep -q 'empty until the first cycle wraps' docs/memory/overview.md && fail "overview not rewritten"
 grep -rqE '^### wordfreq\.[0-9]+' docs/memory || fail "no entries promoted to project memory"
-grep -q 'wordfreq' "$LESSONS" || fail "approved lesson not written"
-[ "$(grep -c 'wordfreq' "$LESSONS")" -le 1 ] || fail "more than the one approved lesson written"
+# ~/.claude is a protected path: headless runs can't write it, so the skill hands the line to the user instead.
+if [ -f "$LESSONS" ]; then
+  grep 'wordfreq' "$LESSONS" >/dev/null || fail "approved lesson not written"
+  [ "$(grep -c 'wordfreq' "$LESSONS")" -le 1 ] || fail "more than the one approved lesson written"
+else
+  grep 'project-lessons.md' <<< "$LAST" >/dev/null || fail "approved lesson neither written nor handed to the user"
+fi
 assert_last_commit '^wordfreq: wrap'
 assert_clean_tree
 pass "wrap"
@@ -1709,6 +1714,10 @@ The skills are linked into each scratch repo's `.claude/skills/`, so the scenari
 3. When it stops, run `/compact`.
 4. Type `continue with the next step`.
 5. Check that it works on step 02, not step 01 again; writes and runs the tests before the implementation; gives the one-line memory checkpoint; and commits as `wordfreq step 02: ...`.
+
+## Manual check: the lessons file
+
+`~/.claude/` is a protected path, so `claude -p` can't write `~/.claude/project-lessons.md` and `08-wrap.sh` only checks that the lesson was handed over. In an interactive session on a copy of the `at-final-gate` snapshot, run `/project-time`, approve the wrap and one lesson, accept the permission prompt, and check the file gets the header and exactly one lesson line. Remove or restore the file afterwards.
 ````
 
 - [ ] **Step 2: Run the manual compaction check**
