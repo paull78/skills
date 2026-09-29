@@ -243,17 +243,18 @@ git commit -m "Add a static checker for skill folders"
 #!/usr/bin/env bash
 # Helpers for scenario runs of the project workflow skills in throwaway repos.
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 
 SCENARIOS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_REPO="$(cd "$SCENARIOS/../.." && pwd)"
 WORKFLOW_SKILLS=(project-time project-spec project-plan project-build project-wrap)
-SNAPSHOTS="${TMPDIR:-/tmp}/project-workflow-snapshots"
+SNAPSHOTS="${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots}"
 LESSONS="$HOME/.claude/project-lessons.md"
 TOOLS=(Read Write Edit Glob Grep Skill Agent
   "Bash(git:*)" "Bash(mkdir:*)" "Bash(ls:*)" "Bash(cat:*)" "Bash(mv:*)" "Bash(cp:*)"
   "Bash(python3:*)" "Bash(test:*)" "Bash(grep:*)" "Bash(find:*)" "Bash(wc:*)"
   "Bash(date:*)" "Bash(make:*)" "Bash(sed:*)" "Bash(awk:*)" "Bash(head:*)" "Bash(tail:*)"
-  "Bash(touch:*)" "Bash(shasum:*)")
+  "Bash(touch:*)" "Bash(shasum:*)" "Bash(echo:*)" "Bash(sort:*)" "Bash(diff:*)" "Bash(cd:*)")
 SESSION=""
 LAST=""
 
@@ -272,6 +273,8 @@ _link_skills() {
     [ -d "$SKILLS_REPO/$s" ] && ln -sfn "$SKILLS_REPO/$s" ".claude/skills/$s"
   done
   grep -qx '.claude/' .git/info/exclude || echo '.claude/' >> .git/info/exclude
+  grep -qx '__pycache__/' .git/info/exclude || echo '__pycache__/' >> .git/info/exclude
+  grep -qx '*.pyc' .git/info/exclude || echo '*.pyc' >> .git/info/exclude
 }
 
 new_scratch() {
@@ -305,13 +308,27 @@ from_snapshot() {
 
 # One user message. Continues the current session unless reset_session was called.
 turn() {
-  local prompt="$1" out
+  local prompt="$1" out rc
   local args=(-p "$prompt" --output-format json --permission-mode acceptEdits
     --add-dir "$HOME/.claude" --allowedTools "${TOOLS[@]}")
   [ -n "$SESSION" ] && args+=(--resume "$SESSION")
-  out="$(claude "${args[@]}")"
+  rc=0
+  out="$(claude "${args[@]}" </dev/null)" || rc=$?
+  if [ "$rc" != 0 ]; then
+    printf '\n## claude -p failed (attempt 1)\nprompt: %s\nexit: %s\noutput: %s\n' "$prompt" "$rc" "$out" >> "$TRANSCRIPT"
+    sleep 30
+    rc=0
+    out="$(claude "${args[@]}" </dev/null)" || rc=$?
+    if [ "$rc" != 0 ]; then
+      printf '\n## claude -p failed (attempt 2)\nprompt: %s\nexit: %s\noutput: %s\n' "$prompt" "$rc" "$out" >> "$TRANSCRIPT"
+      fail "claude -p exited $rc twice (session $SESSION)"
+    fi
+  fi
   SESSION="$(printf '%s' "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin)["session_id"])')"
   LAST="$(printf '%s' "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("result", ""))')"
+  local denials
+  denials="$(printf '%s' "$out" | python3 -c 'import json,sys; d=json.load(sys.stdin).get("permission_denials"); print(d) if d else None')"
+  [ "$denials" != "None" ] && printf '\n## permission denials\n%s\n' "$denials" >> "$TRANSCRIPT"
   printf '\n## user\n%s\n\n## agent\n%s\n' "$prompt" "$LAST" >> "$TRANSCRIPT"
   printf '\n--- agent ---\n%s\n' "$LAST"
 }
@@ -337,8 +354,8 @@ assert_count() {
   [ "$n" = "$3" ] || fail "$1: /$2/ matched $n times, want $3"
 }
 assert_clean_tree() { [ -z "$(git status --porcelain)" ] || fail "working tree not clean: $(git status --porcelain | tr '\n' ' ')"; }
-assert_last_commit() { git log -1 --format=%s | grep -qE -- "$1" || fail "last commit '$(git log -1 --format=%s)' does not match /$1/"; }
-assert_commit() { git log --format=%s | grep -qE -- "$1" || fail "no commit matching /$1/"; }
+assert_last_commit() { git log -1 --format=%s | grep -E -- "$1" >/dev/null || fail "last commit '$(git log -1 --format=%s)' does not match /$1/"; }
+assert_commit() { git log --format=%s | grep -E -- "$1" >/dev/null || fail "no commit matching /$1/"; }
 
 # Lines of one milestone in the plan index.
 milestone_block() { awk -v n="$1" '/^## /{p = ($2 == "Milestone" && $3 == n)} p' docs/current/plan/INDEX.md; }
@@ -349,6 +366,7 @@ test_cmd() { sed -nE 's/.*Test: `([^`]+)`.*/\1/p' docs/current/plan/INDEX.md | h
 protect_lessons() {
   LESSONS_BACKUP="$(mktemp)"
   if [ -f "$LESSONS" ]; then cp "$LESSONS" "$LESSONS_BACKUP"; HAD_LESSONS=1; else HAD_LESSONS=0; fi
+  echo "lessons backup: $LESSONS_BACKUP"
   trap restore_lessons EXIT
 }
 restore_lessons() {
@@ -375,10 +393,10 @@ source "$(dirname "$0")/lib.sh"
 
 new_scratch
 turn "Reply with exactly the word: pineapple"
-echo "$LAST" | grep -qi pineapple || fail "first turn"
+grep -qi pineapple <<< "$LAST" || fail "first turn"
 [ -n "$SESSION" ] || fail "no session id"
 turn "What word did you just reply with? Answer with that word only."
-echo "$LAST" | grep -qi pineapple || fail "resume lost the session"
+grep -qi pineapple <<< "$LAST" || fail "resume lost the session"
 [ -L .claude/skills/project-time ] || [ ! -d "$SKILLS_REPO/project-time" ] || fail "skills not linked"
 pass "smoke"
 ```
@@ -644,7 +662,7 @@ pass "written as it goes"
 sections_before="$(grep '^## ' docs/current/spec.md)"
 reset_session
 turn "/project-time"
-echo "$LAST" | grep -qiE 'describe (the|your) (project|tool)|what (do|would) you (want|like) to build' && fail "resume re-asked for the description"
+grep -qiE 'describe (the|your) (project|tool)|what (do|would) you (want|like) to build' <<< "$LAST" && fail "resume re-asked for the description"
 while read -r h; do grep -qxF "$h" docs/current/spec.md || fail "section lost across the reset: $h"; done <<< "$sections_before"
 pass "resumed"
 
@@ -789,7 +807,7 @@ ls docs/current/plan/step-* >/dev/null 2>&1 && fail "step files written before t
 pass "outline first"
 
 turn "The outline is approved."
-drive 'grep -q "Status: approved" docs/current/plan/INDEX.md 2>/dev/null' "Approved. Mode: sequential." 6
+drive 'grep -q "Status: approved" docs/current/plan/INDEX.md 2>/dev/null' "Approved. Mode: sequential. Stop right after the gate 1 commit; don't start building." 6
 
 assert_grep docs/current/plan/INDEX.md 'Mode: sequential'
 [ -n "$(test_cmd)" ] || fail "no Test: command in the plan header"
@@ -800,10 +818,13 @@ for f in docs/current/plan/step-*.md; do
   assert_grep "$f" '^## Tests to write first'
 done
 for ac in $(grep -oE 'AC-[0-9]+' docs/current/spec.md | sort -u); do
-  grep -q "$ac" docs/current/plan/step-*.md || fail "$ac is not covered by any step"
+  grep -qw "$ac" docs/current/plan/step-*.md || fail "$ac is not covered by any step"
 done
 assert_commit '^wordfreq: plan approved \(gate 1\)'
 pass "gate 1"
+
+assert_count docs/current/plan/INDEX.md '^- \[(x|~)\]' 0
+git log --format=%s | grep -E '^wordfreq step' >/dev/null && fail "build started inside 03"
 
 save_snapshot plan-approved
 ```
@@ -981,14 +1002,14 @@ milestone_block 1 | grep -qE '^- \[( |~)\]' && fail "milestone 1 has unfinished 
 milestone_block 1 | grep -q 'gate pending' || fail "milestone 1 gate should still be pending"
 milestone_block 2 | grep -qE '^- \[x\]' && fail "build ran past the milestone 1 gate"
 assert_commit '^wordfreq step 01'
-eval "$(test_cmd)" || fail "tests fail at gate 1"
+cmd="$(test_cmd)"; [ -n "$cmd" ] || fail "no Test: command"; eval "$cmd" || fail "tests fail at gate 1"
 assert_clean_tree
 pass "stopped at gate 1"
 
-turn "Gate approved, continue."
+turn "Gate approved, continue. Stop at the final gate; don't wrap."
 milestone_block 1 | grep -q 'gate passed' || fail "gate 1 not recorded as passed"
-drive '! grep -qE "^- \[( |~)\]" docs/current/plan/INDEX.md' "Gate approved, continue." 4
-eval "$(test_cmd)" || fail "tests fail at the final gate"
+drive '[ -f docs/current/plan/INDEX.md ] && ! grep -qE "^- \[( |~)\]" docs/current/plan/INDEX.md' "Gate approved, continue. Stop at the final gate; don't wrap." 4
+cmd="$(test_cmd)"; [ -n "$cmd" ] || fail "no Test: command"; eval "$cmd" || fail "tests fail at the final gate"
 pass "reached the final gate"
 
 save_snapshot at-final-gate
@@ -1006,8 +1027,9 @@ source "$(dirname "$0")/lib.sh"
 from_snapshot plan-approved
 turn "/project-time Only do step 01, and stop right after writing its failing tests, before implementing anything."
 assert_grep docs/current/plan/INDEX.md '\[~\] 01'
-dirty="$(git status --porcelain | awk '{print $2}')"
+dirty="$(git status --porcelain --untracked-files=all | awk '{print $NF}' | grep -v '^docs/' || true)"
 [ -n "$dirty" ] || fail "expected uncommitted test files"
+grep -qi test <<< "$dirty" || fail "no uncommitted test file"
 
 reset_session
 turn "/project-time Finish step 01, then stop."
@@ -1040,12 +1062,12 @@ turn "/project-time Only do step 01, then stop."
 step01="$(shasum docs/current/plan/step-01-*.md)"
 
 turn "Change of plan: add a --min-length N option that ignores words shorter than N. Also, pin this: the output stays plain text, never colours."
-drive 'git log --format=%s | grep -q "^wordfreq: plan updated"' "$ACCEPT_OK" 8
+drive 'git log --format=%s | grep -q "^wordfreq: plan updated"' "$ACCEPT_OK Stop after the plan update; don't continue building." 8
 
 assert_grep docs/current/spec.md '^## Amendments'
 assert_grep docs/current/spec.md 'min-length'
 grep -rqE '^### wordfreq\.[0-9]+ · pivot' docs/current/memory || fail "no pivot entry"
-awk '/^## Pinned/{p=1; next} /^## /{p=0} p' docs/current/memory/INDEX.md | grep -qi 'plain text' || fail "pin not in the cycle index"
+awk '/^## Pinned/{p=1; next} /^## /{p=0} p' docs/current/memory/INDEX.md | grep -qiE 'plain.?text|colou?r|ansi' || fail "pin not in the cycle index"
 awk '/^## Notes/{p=1; next} p' docs/current/plan/INDEX.md | grep -qE '[0-9]{4}-[0-9]{2}-[0-9]{2} · plan updated' || fail "no dated plan note"
 grep -lE 'min-length' docs/current/plan/step-*.md >/dev/null || fail "no step covers min-length"
 [ "$(shasum docs/current/plan/step-01-*.md)" = "$step01" ] || fail "a done step was rewritten"
@@ -1414,7 +1436,7 @@ protect_lessons
 turn "/project-time"
 drive '[ ! -d docs/current ]' "Gate approved and manual checks confirmed. The consolidation looks right. Cycle pins are project-wide. Approve only the first lesson." 10
 
-arch="$(ls -d docs/archive/*-wordfreq 2>/dev/null | head -1)"
+arch="$(ls -d docs/archive/*-wordfreq 2>/dev/null | head -1 || true)"
 [ -n "$arch" ] || fail "no archive folder"
 for f in spec.md plan/INDEX.md memory/INDEX.md recap.md; do assert_file "$arch/$f"; done
 for h in 'What was built' 'How it went' 'Decisions that stand' 'Takeaways'; do assert_grep "$arch/recap.md" "^## $h"; done
@@ -1590,16 +1612,19 @@ pass "type override"
 source "$(dirname "$0")/lib.sh"
 
 start_cycle() { # slug, description
+  assert_clean_tree
   git switch -q main
   reset_session
   turn "/project-time new cycle, slug $1: $2 Keep it to one milestone with at most two steps."
   drive 'grep -q "Status: approved" docs/current/plan/INDEX.md 2>/dev/null' "$AUTOPILOT" 25
 }
 finish_cycle() { # slug
+  assert_clean_tree
   git switch -q "feature/$1"
   reset_session
   turn "/project-time"
   drive "ls -d docs/archive/*-$1 >/dev/null 2>&1" "$AUTOPILOT" 25
+  assert_clean_tree
   git switch -q main
   git merge -q --no-ff --no-edit "feature/$1" || fail "merging feature/$1 conflicted"
 }
@@ -1667,7 +1692,7 @@ tools/scenarios/09-feature.sh    # needs wrapped
 tools/scenarios/10-two-branches.sh  # needs wrapped
 ```
 
-Snapshots live in `$TMPDIR/project-workflow-snapshots/`. After changing one skill, re-run from the first scenario that exercises it; earlier snapshots stay valid.
+Snapshots live in `${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots}/` ($TMPDIR is cleaned by macOS, so snapshots default to `~/.cache` instead). After changing one skill, re-run from the first scenario that exercises it; earlier snapshots stay valid.
 
 Runs are slow and cost tokens: each `turn` is a full `claude -p` call. Run them in the background.
 
@@ -1679,7 +1704,7 @@ The skills are linked into each scratch repo's `.claude/skills/`, so the scenari
 
 `claude -p` can't trigger compaction reliably, so this one is by hand.
 
-1. Copy the snapshot: `cp -R "$TMPDIR/project-workflow-snapshots/plan-approved" "$TMPDIR/compact-check" && cd "$TMPDIR/compact-check"`.
+1. Copy the snapshot: `cp -R "${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots}/plan-approved" "$TMPDIR/compact-check" && cd "$TMPDIR/compact-check"`.
 2. Start `claude` and run `/project-time Only do step 01, then stop.`
 3. When it stops, run `/compact`.
 4. Type `continue with the next step`.

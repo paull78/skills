@@ -1,17 +1,18 @@
 #!/usr/bin/env bash
 # Helpers for scenario runs of the project workflow skills in throwaway repos.
 set -euo pipefail
+export PYTHONDONTWRITEBYTECODE=1
 
 SCENARIOS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_REPO="$(cd "$SCENARIOS/../.." && pwd)"
 WORKFLOW_SKILLS=(project-time project-spec project-plan project-build project-wrap)
-SNAPSHOTS="${TMPDIR:-/tmp}/project-workflow-snapshots"
+SNAPSHOTS="${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots}"
 LESSONS="$HOME/.claude/project-lessons.md"
 TOOLS=(Read Write Edit Glob Grep Skill Agent
   "Bash(git:*)" "Bash(mkdir:*)" "Bash(ls:*)" "Bash(cat:*)" "Bash(mv:*)" "Bash(cp:*)"
   "Bash(python3:*)" "Bash(test:*)" "Bash(grep:*)" "Bash(find:*)" "Bash(wc:*)"
   "Bash(date:*)" "Bash(make:*)" "Bash(sed:*)" "Bash(awk:*)" "Bash(head:*)" "Bash(tail:*)"
-  "Bash(touch:*)" "Bash(shasum:*)")
+  "Bash(touch:*)" "Bash(shasum:*)" "Bash(echo:*)" "Bash(sort:*)" "Bash(diff:*)" "Bash(cd:*)")
 SESSION=""
 LAST=""
 
@@ -30,6 +31,8 @@ _link_skills() {
     [ -d "$SKILLS_REPO/$s" ] && ln -sfn "$SKILLS_REPO/$s" ".claude/skills/$s"
   done
   grep -qx '.claude/' .git/info/exclude || echo '.claude/' >> .git/info/exclude
+  grep -qx '__pycache__/' .git/info/exclude || echo '__pycache__/' >> .git/info/exclude
+  grep -qx '*.pyc' .git/info/exclude || echo '*.pyc' >> .git/info/exclude
 }
 
 new_scratch() {
@@ -63,13 +66,27 @@ from_snapshot() {
 
 # One user message. Continues the current session unless reset_session was called.
 turn() {
-  local prompt="$1" out
+  local prompt="$1" out rc
   local args=(-p "$prompt" --output-format json --permission-mode acceptEdits
     --add-dir "$HOME/.claude" --allowedTools "${TOOLS[@]}")
   [ -n "$SESSION" ] && args+=(--resume "$SESSION")
-  out="$(claude "${args[@]}")"
+  rc=0
+  out="$(claude "${args[@]}" </dev/null)" || rc=$?
+  if [ "$rc" != 0 ]; then
+    printf '\n## claude -p failed (attempt 1)\nprompt: %s\nexit: %s\noutput: %s\n' "$prompt" "$rc" "$out" >> "$TRANSCRIPT"
+    sleep 30
+    rc=0
+    out="$(claude "${args[@]}" </dev/null)" || rc=$?
+    if [ "$rc" != 0 ]; then
+      printf '\n## claude -p failed (attempt 2)\nprompt: %s\nexit: %s\noutput: %s\n' "$prompt" "$rc" "$out" >> "$TRANSCRIPT"
+      fail "claude -p exited $rc twice (session $SESSION)"
+    fi
+  fi
   SESSION="$(printf '%s' "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin)["session_id"])')"
   LAST="$(printf '%s' "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("result", ""))')"
+  local denials
+  denials="$(printf '%s' "$out" | python3 -c 'import json,sys; d=json.load(sys.stdin).get("permission_denials"); print(d) if d else None')"
+  [ "$denials" != "None" ] && printf '\n## permission denials\n%s\n' "$denials" >> "$TRANSCRIPT"
   printf '\n## user\n%s\n\n## agent\n%s\n' "$prompt" "$LAST" >> "$TRANSCRIPT"
   printf '\n--- agent ---\n%s\n' "$LAST"
 }
@@ -95,8 +112,8 @@ assert_count() {
   [ "$n" = "$3" ] || fail "$1: /$2/ matched $n times, want $3"
 }
 assert_clean_tree() { [ -z "$(git status --porcelain)" ] || fail "working tree not clean: $(git status --porcelain | tr '\n' ' ')"; }
-assert_last_commit() { git log -1 --format=%s | grep -qE -- "$1" || fail "last commit '$(git log -1 --format=%s)' does not match /$1/"; }
-assert_commit() { git log --format=%s | grep -qE -- "$1" || fail "no commit matching /$1/"; }
+assert_last_commit() { git log -1 --format=%s | grep -E -- "$1" >/dev/null || fail "last commit '$(git log -1 --format=%s)' does not match /$1/"; }
+assert_commit() { git log --format=%s | grep -E -- "$1" >/dev/null || fail "no commit matching /$1/"; }
 
 # Lines of one milestone in the plan index.
 milestone_block() { awk -v n="$1" '/^## /{p = ($2 == "Milestone" && $3 == n)} p' docs/current/plan/INDEX.md; }
@@ -107,6 +124,7 @@ test_cmd() { sed -nE 's/.*Test: `([^`]+)`.*/\1/p' docs/current/plan/INDEX.md | h
 protect_lessons() {
   LESSONS_BACKUP="$(mktemp)"
   if [ -f "$LESSONS" ]; then cp "$LESSONS" "$LESSONS_BACKUP"; HAD_LESSONS=1; else HAD_LESSONS=0; fi
+  echo "lessons backup: $LESSONS_BACKUP"
   trap restore_lessons EXIT
 }
 restore_lessons() {
