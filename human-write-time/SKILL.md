@@ -15,6 +15,17 @@ Three principles run through everything below:
 2. **Write from the goal and the samples, then scan.** Don't draft with a list of banned phrases in view: naming a phrase primes it. The catalogues in `references/` are for the review pass after drafting.
 3. **Samples outrank rules.** A paragraph the author actually wrote beats any stated preference, including this file's and including rules written in the author's own profile.
 
+## Required tool calls for voiced pieces
+
+Voice drift comes from skipping these, and "output only the text" never means skip them. For any voiced piece with a voice source, before you deliver:
+
+1. Run `voice_stats.py` on the matching samples (section 3). The script is in `scripts/` under this skill's base directory, the path shown when the skill loads.
+2. Write the voice card (section 3), privately.
+3. After drafting, read `references/tells-<lang>.md` from the same base directory (section 5).
+4. Save the draft to a scratch file and run `voice_stats.py --draft` on it; revise until the flags are explained or gone (section 5).
+
+In embedded and generate modes these stay invisible to the user: do them, then deliver only the text.
+
 ## Modes
 
 | Mode | Trigger | Deliver |
@@ -47,13 +58,18 @@ Within the source, pick the samples that match the target language first and the
 
 Before drafting a voiced piece, build a private voice card. It's the fix for output that sounds human but like someone else.
 
-1. **Measure.** Run the stats script on the matching samples:
-   `python3 <this skill's folder>/scripts/voice_stats.py --voice ~/.claude/VOICE.md --lang <en|it>`
-   (or `--sample <file>` for samples that aren't in a VOICE.md). Note the ranges: sentence length and spread, sentences per paragraph, punctuation per 1,000 words, contractions, conjunction openers, first-person rate.
-2. **Contrast.** For two or three samples, write a one-paragraph neutral paraphrase in plain assistant prose, then list what the author does that the neutral version lacks. Their word order, the connectors they reach for, how they open, where they put the point, what they repeat instead of varying, which imperfections they keep.
-3. **Write the card.** Five to eight traits in the author's terms, each with a quoted example, plus the things the samples never do.
+First sort the samples: **matching** means same language *and* same register (a letter for a letter, a memo for a memo, a personal message for a personal message). Samples in the same language but another register are only **nearby**.
 
-The card overrides every generic default. Contractions, direct address, parenthetical asides, short sentences, paragraphs opening with And or But: use each only if the samples show it, and at their rate. **Never introduce a feature the samples lack.** If the author never asks rhetorical questions, the draft has none; if their paragraphs run to four sentences, so do the draft's.
+1. **Measure.** Run the stats script on the matching samples only:
+   `python3 <skill base directory>/scripts/voice_stats.py --voice <the VOICE.md in use> --lang <en|it>`
+   (or `--sample <file>` for samples that aren't in a VOICE.md; save matching samples to scratch files if the profile mixes registers). Note the ranges: sentence length and spread, sentences per paragraph, punctuation per 1,000 words, contractions, conjunction openers, first-person rate. With no matching sample, skip the measurement: numbers from another register mislead more than they help.
+2. **Contrast.** For two or three samples (matching first, then nearby), write a one-paragraph neutral paraphrase in plain assistant prose, then list what the author does that the neutral version lacks. Their word order, the connectors they reach for, how they open, where they put the point, what they repeat instead of varying, which imperfections they keep.
+3. **Collect the phrasing.** Copy 8 to 10 real phrases from the samples that show how the author says things: their verbs, their connectors, their openings, the constructions they carry over from another language. This matters most for authors writing in a second language: their plain words and first-language constructions ("I came to know", "participate to", "like for example") are the voice, and polished native phrasing erases it.
+4. **Write the card.** Five to eight traits in the author's terms, each with a quoted example, the phrase bank, and the things the samples never do.
+
+The card overrides every generic default. Contractions, direct address, parenthetical asides, short sentences, paragraphs opening with And or But: follow the matching samples, at their rate. If the author's matching samples never ask rhetorical questions, the draft has none; if their paragraphs run to four sentences, so do the draft's. Without a matching sample, don't strip what the register normally has (a cover letter keeps its contractions even if the author's memos have none); follow the profile's notes for that register and the nearby samples, loosely.
+
+**Write at the author's level.** Use their plain verbs and their constructions. Don't upgrade the vocabulary, don't reach for native idioms they don't use, and don't use the stock formulas of the genre ("I am writing to", "Same here", "reads like a description of", "I look forward to"). Keep their second-language constructions at their rate, but never invent errors that change or blur the meaning.
 
 With no voice source and a voiced register, fall back to plain human defaults: get to the point in the first sentence, name the agent, prose over bullets, digits for numbers, stop when the point is made.
 
@@ -112,7 +128,7 @@ Mandatory in every mode, including embedded, because these patterns are what flu
 
 1. Which one-sighting tells from section 5 are still there? Look hardest for not-X-but-Y, closers, dashes and invented specifics.
 2. Does the text state any fact, name, number, date or source that isn't in the material? Remove it.
-3. For a voiced piece: is every metric in range, and does the draft do anything the samples never do?
+3. For a voiced piece: is every metric in range, and does the draft do anything the matching samples never do? Is there a word, idiom or stock formula this author wouldn't reach for? Compare against the phrase bank.
 4. Does it sound like something this author would write, or like a model working hard to imitate them? If it feels performed, pull back toward the samples.
 
 Fix what you find, then deliver. Report the self-check only in audit mode.
