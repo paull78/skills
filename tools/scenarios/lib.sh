@@ -86,7 +86,7 @@ turn() {
   LAST="$(printf '%s' "$out" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("result", ""))')"
   local denials
   denials="$(printf '%s' "$out" | python3 -c 'import json,sys; d=json.load(sys.stdin).get("permission_denials"); print(d) if d else None')"
-  [ "$denials" != "None" ] && printf '\n## permission denials\n%s\n' "$denials" >> "$TRANSCRIPT"
+  [ -n "$denials" ] && printf '\n## permission denials\n%s\n' "$denials" >> "$TRANSCRIPT"
   printf '\n## user\n%s\n\n## agent\n%s\n' "$prompt" "$LAST" >> "$TRANSCRIPT"
   printf '\n--- agent ---\n%s\n' "$LAST"
 }
