@@ -238,7 +238,7 @@ When pausing mid-step, or after notable progress inside a long step, update the 
 
 **Run length.** Continues through the milestone's steps and stops at the gate, or earlier on a blocker. The user can ask for one step, or to stop after a given step.
 
-**Gate.** Full test suite, the milestone's acceptance criteria checked, `manual` items listed for the user, memory sweep (anything unrecorded since the last gate? any index or area file due for a split?), a short recap, and the user's go-ahead. The index records the gate as passed with the date.
+**Gate.** Every milestone except the last: the last one's checks are run by `project-wrap`'s final gate, so the user never gets two identical gates back to back. Full test suite, the milestone's acceptance criteria checked, `manual` items listed for the user, memory sweep (anything unrecorded since the last gate? any index or area file due for a split?), a short recap, and the user's go-ahead. The index records the gate as passed with the date.
 
 **Parallel mode.** When the next steps form a `∥` group and the mode allows it, build becomes an orchestrator:
 - Each step goes to a sub-agent in its own git worktree, with a fixed prompt: the step file, the conventions, and the report format.

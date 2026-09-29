@@ -10,6 +10,8 @@
 
 **Spec:** `docs/superpowers/specs/2026-09-29-project-workflow-design.md`
 
+**Status:** executed. The `SKILL.md` texts below are the first drafts; the committed skills were revised after the scenario reviews (Gate 0 approval rules, AC written during the interview, build checkpoint and verify wording, parallel resume and cleanup, the last milestone gate folded into wrap). The committed files are authoritative.
+
 ---
 
 ## File structure
@@ -1703,7 +1705,7 @@ Runs are slow and cost tokens: each `turn` is a full `claude -p` call. Run them 
 
 The skills are linked into each scratch repo's `.claude/skills/`, so the scenarios test the working copy. Your user-level settings and plugins load too, which is intended: interference from them is a real finding.
 
-`08-wrap.sh` writes to `~/.claude/project-lessons.md` and restores the file on exit.
+`08-wrap.sh` backs up `~/.claude/project-lessons.md` and restores it on exit, in case a run manages to write it.
 
 ## Manual check: compaction
 
