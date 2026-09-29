@@ -9,7 +9,7 @@ Closes a cycle. Turns what's scattered across memory and plan into a recap a per
 
 Follow the conventions in the project-time block of `AGENTS.md`. If `docs/current/` is missing, there's nothing to wrap: say so.
 
-**Modes.** Every step `[x]`, or `Current:` starts with `wrap:` → full wrap. Otherwise, or when the user asks for "a recap" or "where do we stand" → interim recap: write section 2 only, commit only `recap.md` as `<slug>: interim recap`, and stop. If the user explicitly asks to close the cycle with steps left, list them, write a `decision` entry, and run the full wrap; the open steps go under Open issues in the recap.
+**Modes.** Every step `[x]`, or `Current:` starts with `wrap` → full wrap. Otherwise, or when the user asks for "a recap" or "where do we stand" → interim recap: write section 2 only, commit only `recap.md` as `<slug>: interim recap`, and stop. If the user explicitly asks to close the cycle with steps left, list them, write a `decision` entry, and run the full wrap; the open steps go under Open issues in the recap.
 
 Track progress in the plan INDEX `Current:`: `wrap: gate passed`, `wrap: recap written`, `wrap: memory consolidated`, `wrap: lessons done`. On entry, continue from the first unfinished section. Never copy an entry whose ID already exists in `docs/memory/`, and never append a lesson already in the file.
 
