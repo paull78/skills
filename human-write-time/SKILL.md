@@ -1,382 +1,143 @@
 ---
 name: human-write-time
-description: Write human-facing prose that doesn't read as AI-generated, and de-slop drafts that do. Hard-bans negative parallelism ("it's not X, it's Y"), dead AI vocabulary, em dashes, puffery, participle padding, and chatbot leakage; loads an optional voice profile so the result sounds like the author instead of a house style. Use when writing or editing blog posts, essays, newsletters, emails, social copy, landing pages, READMEs, docs, release notes, or marketing copy, and whenever the user says "human-write-time", "make this sound human", "de-slop this", "humanize this", "this reads like AI", or complains that a draft sounds LLM-generated. Not for code, commit messages, or chat replies.
+description: Write human-facing prose that sounds like its author and not like a model, and de-slop drafts that don't. Measures the author's voice from real writing samples and lets them outrank generic rules, hunts machine tells after drafting (negative parallelism, staged closers, aphorisms, puffery, chatbot residue, invented specifics) in English and Italian, and never adds facts. Use when writing or editing blog posts, essays, newsletters, emails, social copy, landing pages, READMEs, docs, release notes, recaps, or marketing copy, and whenever the user says "human-write-time", "make this sound human", "make this sound like me", "de-slop this", "humanize this", "this reads like AI", or complains that a draft sounds LLM-generated. Not for code, commit messages, or chat replies.
 ---
 
 # Human Write Time
 
-Write prose that reads as though a person wrote it, and repair prose that doesn't.
+Write prose a careful reader would believe a person wrote, and that the author would recognise as theirs. Repair prose that fails either test.
 
-Two layers, kept separate:
+Two layers, kept separate. The de-slop layer removes machine tells and applies to all human-facing prose. The voice layer makes the text sound like one particular author, and applies only when there is a voice to match and the register calls for one. Most failures come from applying the second where only the first belongs, or from replacing the author's habits with a generic "human" style.
 
-- **De-slop layer.** Removes machine tells. Applies to all human-facing prose, always.
-- **Voice layer.** Makes the result sound like a particular author. Loads only when there is a voice to match and the register calls for one.
+Three principles run through everything below:
 
-Most failures come from applying the second layer where only the first belongs.
+1. **Match the author's rate, not zero.** People use contrast, lists of three, dashes and short sentences too. Models use them everywhere. The target is how often *this author* does it.
+2. **Write from the goal and the samples, then scan.** Don't draft with a list of banned phrases in view: naming a phrase primes it. The catalogues in `references/` are for the review pass after drafting.
+3. **Samples outrank rules.** A paragraph the author actually wrote beats any stated preference, including this file's and including rules written in the author's own profile.
 
 ## Modes
 
-| Mode | Trigger | You deliver |
-|------|---------|-------------|
-| **Generate** | Asked to write something new | The piece. Nothing else unless asked. |
-| **Audit** | Handed an existing draft, file, or paste | Rewritten text, then the change log table |
-| **Embedded** | This skill loaded inside a larger task | Final text only. No draft, no audit, no change log, no commentary. |
+| Mode | Trigger | Deliver |
+|---|---|---|
+| Generate | Asked to write something new | The piece only |
+| Audit | Handed an existing draft, file or paste | The rewrite, then the change log |
+| Embedded | Loaded inside a larger task | Final text only, no commentary |
 
-In file mode, rewrite the file in place with the final version only. Leave code blocks, frontmatter, data, and link targets untouched. Report a short summary in conversation, not in the file.
+In file mode, rewrite the file in place with the final version only. Leave code blocks, frontmatter, data and link targets untouched, and report a short summary in conversation.
 
-## Step 1. Register check
+## 1. Register
 
-Ask what kind of text this is before touching voice.
+Neutral registers (reference docs, API docs, specs, legal text, encyclopedic writing, changelogs): plain and voiceless is the human register. Apply the de-slop layer only. Don't inject first person, opinion, humor or personality; that makes a reference doc worse and more obviously generated.
 
-**Neutral registers** (reference docs, API documentation, technical specs, legal text, encyclopedic writing, changelogs): plain and voiceless *is* the human register here. Apply the de-slop layer. Do not inject first person, opinion, humor, or personality. Adding voice to a reference doc makes it worse and more obviously generated.
+Voiced registers (essays, posts, newsletters, emails, memos, recaps, opinion, social, most marketing): both layers. If a text sits between the two, stay closer to neutral.
 
-**Voiced registers** (essays, blog posts, newsletters, emails, opinion, social copy, most marketing): apply both layers.
+## 2. Voice source
 
-If it sits between the two, stay closer to neutral. Under-voicing is recoverable, over-voicing is not.
+For voiced registers, take the first that exists:
 
-## Step 2. Voice source
+1. A path or sample the user gives in the request.
+2. `VOICE.md` or `.claude/VOICE.md` in the current repo: the project's house voice, which wins for anything published under that project.
+3. `~/.claude/VOICE.md`: the author's personal voice, everywhere else.
+4. Surrounding context: the rest of the document, the thread, the repo's existing prose.
+5. Nothing: ask for one sample of the author's writing before drafting. Don't invent a house style.
 
-For voiced registers, resolve in this order and stop at the first hit:
+Within the source, pick the samples that match the target language first and the register second. An Italian email is matched against Italian samples, a company memo against the memo. The profile's notes on the register ("By context" sections and the like) apply too, but where a stated rule and the samples disagree, follow the samples.
 
-1. A path or sample the user gives you in the request.
-2. `VOICE.md` or `.claude/VOICE.md` in the current repo. This is the *project's* house voice. It wins for anything published under that project, including its README and docs, even when the author has a personal profile.
-3. `~/.claude/VOICE.md`. This is the *author's* personal voice, and it applies everywhere else.
-4. Surrounding context: the rest of the document, earlier messages in the thread, other posts on the same site, the repo's existing prose.
-5. Nothing found. Ask for one sample of the author's writing before drafting. Do not invent a house style and do not default to the personality rules below.
+## 3. Voice card
 
-Read the profile's writing samples before its rules. A paragraph the author actually wrote carries more signal than any list of preferences, including this file's.
+Before drafting a voiced piece, build a private voice card. It's the fix for output that sounds human but like someone else.
 
-**A voice profile overrides this skill.** If the profile uses em dashes, keep em dashes at the profile's frequency. If it writes long unbroken paragraphs, write long unbroken paragraphs. The skill supplies defaults, the author supplies the truth.
+1. **Measure.** Run the stats script on the matching samples:
+   `python3 <this skill's folder>/scripts/voice_stats.py --voice ~/.claude/VOICE.md --lang <en|it>`
+   (or `--sample <file>` for samples that aren't in a VOICE.md). Note the ranges: sentence length and spread, sentences per paragraph, punctuation per 1,000 words, contractions, conjunction openers, first-person rate.
+2. **Contrast.** For two or three samples, write a one-paragraph neutral paraphrase in plain assistant prose, then list what the author does that the neutral version lacks. Their word order, the connectors they reach for, how they open, where they put the point, what they repeat instead of varying, which imperfections they keep.
+3. **Write the card.** Five to eight traits in the author's terms, each with a quoted example, plus the things the samples never do.
 
-When you have a sample, read it for sentence length distribution, vocabulary level, punctuation habits, recurring phrases, how it opens and closes, and what it never does. Match those habits instead of applying generic rules.
+The card overrides every generic default. Contractions, direct address, parenthetical asides, short sentences, paragraphs opening with And or But: use each only if the samples show it, and at their rate. **Never introduce a feature the samples lack.** If the author never asks rhetorical questions, the draft has none; if their paragraphs run to four sentences, so do the draft's.
 
-## Step 3. Frequency tiers
+With no voice source and a voiced register, fall back to plain human defaults: get to the point in the first sentence, name the agent, prose over bullets, digits for numbers, stop when the point is made.
 
-Every rule below carries a tier. This matters: a model that satisfies a ban list perfectly produces clean prose with no texture, which is its own tell.
+## 4. Draft
 
-- **HARD.** Never. One instance is a defect. Rewrite the sentence.
-- **STRONG (70 to 80%).** The default. Deviate when the content genuinely calls for it, not when it's convenient.
-- **LIGHT.** Preference. Context decides. Anything unlabeled is light.
+Draft from the author's material: the brief, notes, facts, opinions and anecdotes they gave you. Don't write a generic draft and then "voice" it; edits anchor on the draft, and the result stays closer to the model than to the author.
 
-Do not avoid a HARD-listed word forever when it is genuinely the right word in its literal sense. "Robust standard errors" is statistics. "Harness" is a piece of equipment. "Align the columns" is a real instruction. The ban targets the puffery sense, not the dictionary.
+Put the matching samples in front of you as the text you're continuing, not as rules to satisfy. Write the piece as the next thing this author wrote.
 
----
+What makes prose human, beyond avoiding tells:
 
-# HARD rules
+- **Specifics from the material.** Names, numbers, dates, real instances. Specificity is the whole game, and it only ever comes from the source.
+- **A stance.** Commit where the material supports it. Hedge honestly and in the first person ("I think", "probably") where the author is unsure; never stack qualifiers.
+- **Lopsided weight.** One point gets four paragraphs, another a clause, because the author cares more about one.
+- **Unresolved tension** where it is unresolved. Not every section needs a takeaway.
+- **Rhythm from content.** A long sentence that carries a real list, a short one where the point is short. Never manufacture fragments for effect.
+- **Ordinary words, repeated.** Use the name again rather than cycling synonyms.
 
-## 1. Negative parallelism and reframe constructions
+## 5. Review pass
 
-The single most reliable marker of machine text. Every model does it, several times per response, because the pattern is dense in persuasive writing, TED talks, op-eds, and marketing copy. It makes a shallow idea feel profound at zero cost. Readers now register it as *machine* before they register the content.
+After drafting, read the catalogue for the draft's language: `references/tells-en.md` or `references/tells-it.md`. Hunt shapes, not strings: a banned word swapped for a synonym, or a not-X-but-Y split across two sentences, is the same tell.
 
-Banned shapes:
+These count on one sighting, and they're the ones that survive first passes:
 
-- "This isn't X. This is Y."
-- "Not X. Y."
-- "It's not just about X, it's about Y."
-- "Not only X, but also Y."
-- "Less X, more Y."
-- "Forget X. This is Y."
-- "X? No. Y."
-- "Stop thinking X. Start thinking Y."
-- "You don't need X. You need Y."
-- "The question isn't X, the question is Y."
-- "X is dead, Y is the future."
-- "X is overrated, Y is what matters."
-- Any sentence that negates a framing and then asserts the corrected one.
+- **Not X but Y** in any costume: "It's not X, it's Y", "Not only X but Y", "Stop X. Start Y", "Y rather than X", "It asks no permission", the version split across two sentences, the tail ", no guessing, no friction". Delete the negated half, unless the reader really holds X or X is the author's own former view.
+- **Dramatic closers and fragment rows**: a one-line moral, "The result?", "Enter X.", "That distinction matters."
+- **Aphorisms and invented concept labels**: "X is the language of Y", "the acceleration trap".
+- **Staged run-ups and staged candor**: "Here's the thing", "Honestly?", "Look,", "Worth stating plainly".
+- **Arguing with no one and method narration**: "A tempting approach would be...", "Anything unconfirmed is flagged rather than guessed."
+- **Preview, recap and a takeaway on every section.**
+- **Chat residue**: "Great question", "I hope this helps", "Let me know if".
+- **Em dashes in Claude output**: remove them by restructuring (split the sentence, use and/but/so, or parentheses if the author uses them). Never swap them all for colons or semicolons. In Italian, follow the author's punctuation, including spaced en dashes if they use them.
+- **Invented specifics**: any fact, number, name, quote or source not in the material.
 
-Variants that survive a careless first pass:
+Everything else in the catalogues counts only in clusters: three in a paragraph means something, one on a page means a person wrote a sentence.
 
-- "While X might seem right, Y is actually..." (same skeleton, different coat)
-- "Sure, X works. But Y is where the real..." (concession plus pivot)
-- "X gets all the attention, but Y is what actually..." (third disguise)
-- Tailing negation: "...with no guessing, no setup, no friction."
+Then check the voice in numbers: save the draft and run the script with `--draft <file>` against the same samples. Revise anything flagged out of range, then run it again. Treat the flags as evidence, not law: a short piece has noisy numbers, and a flag on a metric the brief itself explains (a list of questions the user asked for) can stand.
 
-**The fix.** Delete everything before the positive claim. "It's not about the prompt, it's about the context" becomes "It's about the context." The negated half carries no information. A reader does not need to be told what a thing isn't before being told what it is.
+## Information mandate
 
-## 2. Dead AI vocabulary
+Preserve the information, not the shape. Every claim, name, number, date, quotation and citation in the source survives. Never add one. A fabrication is a defect even when it reads more human than the vague sentence it replaced: when a vague sentence has no facts under it, keep it vague, cut it, or ask the author.
 
-Statistically overrepresented in model output. Grouped so the pattern generalizes to words not listed.
+Reordering paragraphs, merging sections and cutting headings are allowed, because the shape is usually where the machine left its prints. What survives reordering is the hierarchy: if the source treats one point as the main event and another as an aside, that ranking holds.
 
-- **Hype.** revolutionize, game-changer, cutting-edge, groundbreaking, breakthrough, unleash, supercharge, unlock, transformative, disruptive, unprecedented, 10x anything.
-- **Corporate abstraction.** leverage, synergy, holistic, streamline, optimize, scalable, robust, seamless, frictionless, turnkey, plug-and-play, future-proof, data-driven, mission-critical, empower, democratize, ecosystem.
-- **Praise and puffery.** meticulous, meticulously, unparalleled, vibrant, commendable, visionary, pioneering, trailblazing, renowned, breathtaking, stunning, nestled, iconic.
-- **Fake-depth nouns.** tapestry, realm, landscape (abstract), interplay, testament, paradigm, intricacies, fabric, journey (abstract).
-- **Significance inflation.** crucial, pivotal, vital, essential, profound, enduring, key (as adjective).
-- **Verb tics.** delve, harness, foster, garner, showcase, underscore, accentuate, elevate, navigate (metaphorical), surpass, captivate, reimagine, redefine, highlight (meaning "shows").
+## Leave alone
 
-## 3. Em dashes and en dashes
+Over-editing ruins human writing. These are not tells on their own: correct grammar, formal vocabulary used accurately, mixed registers, dry plain writing, ordinary transitions, a single dash, one short emphatic sentence, passive voice, unsourced claims, a flagged word inside a quotation or a name.
 
-Remove all of them. Use commas, periods, colons, semicolons, or parentheses. Restructure the sentence if none of those fit.
+Preserve on sight: specific hard-to-invent details, unresolved mixed feelings, dated references, asides and self-corrections, uneven rhythm, and the author's idiosyncrasies, including spelling and punctuation habits and non-native constructions that are clearly theirs. Don't normalise a voice into compliance.
 
-Single documented exception: a voice profile or writing sample that uses dashes. Then match its frequency.
+The date check: ChatGPT went public on 30 November 2022. Text written before that was written by a person whatever it looks like. In audit mode, check the date first; if the text predates the tooling, say so and leave it alone.
 
-## 4. Copula avoidance
+## Self-check before delivering
 
-"Serves as," "stands as," "represents," "marks a," "boasts a," "features a," "offers a," "holds the distinction of being," used to dodge a plain verb.
+Mandatory in every mode, including embedded, because these patterns are what fluent generation produces by default and only a reread catches them:
 
-> AI: The library serves as a foundation for the parser.
-> Human: The parser is built on the library.
+1. Which one-sighting tells from section 5 are still there? Look hardest for not-X-but-Y, closers, dashes and invented specifics.
+2. Does the text state any fact, name, number, date or source that isn't in the material? Remove it.
+3. For a voiced piece: is every metric in range, and does the draft do anything the samples never do?
+4. Does it sound like something this author would write, or like a model working hard to imitate them? If it feels performed, pull back toward the samples.
 
-Say "is." Say "has."
+Fix what you find, then deliver. Report the self-check only in audit mode.
 
-## 5. Participle padding
+## Audit output
 
-Present-participle phrases bolted onto a sentence to fake analysis: "highlighting its importance," "underscoring the significance," "reflecting broader trends," "symbolizing the shift," "contributing to the rich tapestry of."
-
-Delete the phrase. If the analysis is real, it earns its own sentence with a specific claim.
-
-## 6. Puffery and significance inflation
-
-"A pivotal moment in the evolution of." "Marking a significant shift toward." "Setting the stage for." "Left an indelible mark on." "A key turning point."
-
-State the fact. Let the reader decide what it means.
-
-Same family, borrowed notability. A sentence whose only job is to establish that the subject matters: press logos recited in a row, follower counts, funding totals, award lists, "as featured in," "trusted by teams at." Keep the ones a reader needs. Cut the ones that are there to impress, and never assemble a list of them to open a piece.
-
-## 7. False ranges
-
-"From ancient traditions to modern innovations." "From startups to enterprises." If you cannot name meaningful middle ground between the two poles, the range is decorative. Delete it, or list the specific things.
-
-## 8. Rule of three
-
-Three adjectives in a row. Three parallel short phrases. Three-item lists used to make thin analysis look complete. "Faster, cheaper, and more reliable."
-
-Use two. Use four. Or name the one thing that actually matters.
-
-## 9. Elegant variation
-
-Cycling synonyms for the same referent because repetition feels wrong: a person becomes "the protagonist," then "the key player," then "the eponymous figure." A tool becomes "the platform," then "the solution," then "the offering."
-
-Use the name again. Honest repetition beats forced synonyms.
-
-## 10. Meta commentary and signposting
-
-"In this article, I will." "Let's dive in." "Let's explore." "Let's unpack." "Here's what you need to know." "Let me walk you through." "In this section we will discuss." "To put this in perspective." "In other words." "It goes without saying."
-
-Say the thing. Do not announce that you are about to say the thing.
-
-## 11. Dead transitions and filler
-
-- Transitions: furthermore, moreover, additionally, that said, that being said, with that in mind, on top of that, it is also worth mentioning.
-- Throat-clearing: "it's important to note that," "it's worth noting that," "what makes this particularly interesting is," "the implications here are," "the real question is," "at its core," "what really matters is."
-- Bloat: "in order to" (use "to"), "due to the fact that" (use "because"), "at this point in time" (use "now"), "a wide variety of" (use "many" or name them).
-
-## 12. Engagement bait and hype framing
-
-"Let that sink in." "Read that again." "Full stop." "This changes everything." "Here's the part nobody's talking about." "What nobody tells you." "Most people don't realize." "Are you paying attention?" Any promise of superpowers or overnight transformation.
-
-## 13. Vague attribution
-
-"Experts argue." "Studies show." "Industry reports suggest." "Observers say." "It is widely believed."
-
-Name the source or cut the claim. **Never invent an attribution to satisfy this rule.** An unsourced sentence deleted is correct. A plausible-sounding fabricated citation is a serious defect.
-
-## 14. Chatbot leakage and sycophancy
-
-"I hope this helps." "Let me know if you'd like." "Would you like me to." "Certainly." "Of course." "Great question." "Excellent point." "You're absolutely right."
-
-These belong in chat. Strip them from anything published.
-
-## 15. Cutoff disclaimers and gap-filling speculation
-
-"As of my last update." "Based on available information." "While specific details are limited."
-
-Also the softer version, where a guess about the world is dressed as knowledge: "the company likely faced challenges," "he probably maintained a low profile," "this may have contributed to."
-
-State what is unknown, or leave it out. Note this is *not* the same as honest first-person uncertainty, which is required. See Craft below.
-
-## 16. Generic upbeat conclusions
-
-"Exciting times lie ahead." "The future looks bright." "Only time will tell." "In conclusion." "At the end of the day." "Ultimately." "Moving forward."
-
-If the point is made, stop. Do not summarize what the reader finished two paragraphs ago. End on the last concrete thing you have to say.
-
-## 17. Aphorism formulas
-
-"X is the Y of Z." "X becomes a trap." "The best X is the one you actually Y." Constructions engineered to sound quotable. Replace with the concrete claim underneath.
-
-## 18. Diff-anchored writing
-
-Describing a thing by what changed instead of what it is. "This function was added to replace the old handler." Nobody reading it later cares about the diff.
-
-> Write: This function retries failed uploads with exponential backoff.
-
-## 19. Formulaic section shapes
-
-"Challenges and Future Prospects" as a heading. "Despite these challenges, X continues to thrive." Any section that exists because an outline template said it should.
-
-## 20. Formatting tells
-
-- **Title Case In Headings.** Use sentence case.
-- **Decorative emojis** in headings, bullets, or as paragraph markers. Remove.
-- **Mechanical bolding** of every acronym, defined term, or first mention. Bold 1 to 2 genuine moments per section, no more.
-- **Inline-header lists**, where every bullet is a bold term, a colon, then a sentence. If the items are prose, write prose.
-- **Fragmented headers**: a one-line restatement of the heading sitting between the heading and the real content. Delete it.
-- **Curly quotes** when the platform did not generate them. Use straight quotes.
-- Hyphenated pairs stay hyphenated attributively ("a cross-functional team") and lose the hyphen predicatively ("the team is cross functional").
-
-## 21. Fragment-question pivots and stage cues
-
-A one-word question standing alone to set up its own answer: "The result?" "The catch?" "The problem?" "The kicker?" "The best part?" "Why?" A bare "How?" on its own line. These manufacture suspense for information that needed none.
-
-Same family, the stage cue that announces an arrival: "Enter Lockstep." "Cue the rewrite." "Spoiler: it doesn't."
-
-Delete the setup and state the thing. "The result? Builds got faster." becomes "Builds got faster."
-
----
-
-# Structural tells
-
-The rules above catch AI-shaped sentences. These catch AI-shaped documents, where every paragraph is clean and the piece still reads as generated.
-
-- **Preview and recap frame.** An intro announcing what the piece will cover, and a conclusion restating it. Cut both. Start with the first real thing, end with the last real thing. HARD.
-- **A takeaway on every section.** Each section closing with a one-line lesson. Most sections should just stop. HARD.
-- **Symmetric sections.** Every section the same length, each with the same number of subpoints. Real writing is lopsided, because the author cared more about some parts. STRONG.
-- **Uniform paragraph architecture.** Every paragraph built topic sentence, then support, then transition. Individually fine, collectively a fingerprint. STRONG.
-- **Question headings.** "What is X?" "Why does it matter?" "How do I get started?" The FAQ skeleton wrapped around something that is not an FAQ. STRONG.
-- **Forced balance.** Equal weight to pros and cons regardless of which is actually true, because even-handedness reads as safe. If one side is right, say so. STRONG.
-- **Imposed listicle.** "5 ways to X" when the piece is one argument that got chopped into 5. STRONG.
-
-When the shape is the problem, fixing sentences will not help. Restructure first, then de-slop the prose.
-
----
-
-# STRONG tendencies
-
-- **Vary sentence length.** Machine text has metronome rhythm: every sentence mid-length, every paragraph three or four sentences, perfectly even. Real writing breathes unevenly. Short. Then longer. Then a fragment. Then a thirty-word sentence that earns its length. Check for runs of three sentences within five words of the same length.
-- **Active voice and named agents.** "The system preserves results," not "results are preserved."
-- **Contractions**, in voiced registers.
-- **Direct address.** "I" and "you," in voiced registers.
-- **Get to the point.** No warm-up laps. The first sentence should carry content.
-- **Formatting like salt.** Headers, bullets, and numbered lists only when the content is genuinely enumerable. Prose is the default.
-- **Numbers as digits.** 3 years, 10 tools, 500 users.
-- **Start sentences with And, But, So, Like** when the logic calls for it. A new paragraph usually implies a "but" or a "therefore," even when the word is absent.
-- **Stop when the point is made.** Length is not thoroughness.
-
-# LIGHT preferences
-
-Word choices, structural patterns, humor placement, where to put an aside. Content decides. Do not use the same opening formula every time just because it worked once.
-
----
-
-# Craft: what fills the space
-
-Removing tells leaves clean, lifeless prose unless something replaces them.
-
-- **Be specific.** Numbers, names, dates, actual instances. Specificity is the whole game. Humor comes from it too: be unexpectedly precise.
-- **Real examples over hypotheticals.** Point at something that happened. Never "imagine a scenario where."
-- **Commit.** Take a stance. Model text reads like someone afraid to be wrong: everything "may," "could," "is often considered."
-- **Hedge honestly, and only about yourself.** "I think," "probably," "I'm not sure," "kinda" are human and required where true. Three distinct things get confused here:
-  - Honest first-person confidence ("I think this is the wrong call") → keep, use freely.
-  - Stacked qualifier mush ("could potentially possibly be argued") → cut to one word or none.
-  - Speculation about the world offered as fact-substitute ("the team likely struggled") → cut, or say you don't know.
-- **Physical verbs for abstract processes.** Sanded down. Bolted on. Stripped back. Wedged in.
-- **Parenthetical asides** for editorial commentary, honest reactions, and deflating your own seriousness.
-- **Write lopsided.** One point gets four paragraphs, another gets a clause. Even weighting across sections is a machine habit.
-- **Leave tension unresolved** where it is unresolved. Not every section needs a takeaway.
-
----
-
-# Worked example
-
-**Source:**
-
-> In today's fast-paced development landscape, managing dependencies isn't just a chore, it's a
-> critical bottleneck that can make or break your team's velocity. That's why we're thrilled to
-> announce Lockstep, a groundbreaking new tool that revolutionizes how teams handle package
-> updates. Lockstep serves as a comprehensive solution, seamlessly integrating with your existing
-> workflow while providing unparalleled visibility into your dependency tree. The result? Teams
-> report shipping faster, with fewer conflicts and greater confidence. Exciting times lie ahead.
-
-**Rewrite:**
-
-> Dependency updates are the slowest part of our week, so we built Lockstep.
->
-> It reads the lockfile you already have, so there is nothing to migrate. And it flags which
-> packages actually changed behavior, instead of just which ones changed version numbers.
->
-> We have been running it internally and conflicts are down.
-
-What that fixed, in order of appearance: "in today's" opener, negative parallelism ("isn't just a chore, it's a bottleneck"), "landscape" as abstraction, "thrilled to announce", "groundbreaking", "revolutionizes", copula avoidance ("serves as"), "seamlessly", "unparalleled", the fragment-question pivot ("The result?"), a rule of three ("faster, fewer conflicts, greater confidence"), and a generic upbeat close.
-
-**The part that matters most.** The source claims "teams report shipping faster" with nothing behind it. The obvious rewrite is "conflicts dropped 40%", which reads far better and is a fabrication. There was no 40% in the source. So the rewrite keeps the weak claim weak: "conflicts are down."
-
-When a vague sentence has no facts under it, you have three moves. Keep it vague, cut it, or ask the author for the real number. Inventing one is never on the list, however much better it reads.
-
----
-
-# Do not flag: false positives
-
-Over-editing is the failure mode that ruins human writing. These are not tells on their own:
-
-- Professional grammar, correct spelling, consistent formatting.
-- Formal or technical vocabulary used accurately.
-- Mixed formal and casual register in the same piece.
-- Dry, plain writing with no specific tells. Boring is not artificial.
-- Salutations, sign-offs, and ordinary transitions in isolation.
-- Curly quotes, which most editors insert automatically.
-- A single em dash, or one short emphatic sentence used for real emphasis.
-- Unsourced claims, which are ordinary across the web.
-- A banned word appearing inside a quotation, proper noun, title, or as the subject under discussion.
-
-**The cluster rule.** One isolated tell is not a finding. Look for clusters. Three of these in a paragraph means something. One of them in a page means a person wrote a sentence.
-
-**The date check.** ChatGPT opened to the public on 30 November 2022. Text written before that was written by a person, whatever it looks like. If the source is dated, or quoted from something dated, check the date before diagnosing anything. Older prose is full of these patterns because models learned them from somewhere, and the somewhere was us. In audit mode this outranks every rule above: say the text predates the tooling and leave it alone.
-
-# Preserve on sight
-
-Leave these alone even when they look irregular. They are the evidence a person was here.
-
-- Specific, unusual, hard-to-fabricate details.
-- Mixed feelings and tensions the author never resolves.
-- Dated references, era-bound slang, things that will age badly.
-- Genuine asides, digressions, and mid-sentence self-corrections.
-- Uneven rhythm and lopsided structure.
-- Idiosyncratic habits, including ones this skill would otherwise discourage. Do not normalize a voice into compliance.
-
-# Information mandate
-
-Preserve the information, not the shape.
-
-Every claim, name, number, date, quotation, and citation in the source survives the rewrite. When preserving information and improving prose pull in opposite directions, information wins. Never add a fact, a source, or a detail that was not there. A fabrication is a defect even when it reads more human than the vague sentence it replaced.
-
-Compressing a dull passage is allowed. Dwelling where a person would naturally dwell is allowed. Reordering paragraphs, merging sections, and cutting a heading are allowed, because the shape is usually where the machine left its prints. Inventing is not.
-
-What survives reordering is the hierarchy. If the source treats one point as the main event and another as an aside, that ranking holds in the rewrite even when the paragraphs move. Promoting a minor point to the top because it makes a better opening changes the argument, and that counts as changing the meaning.
-
----
-
-# Self-check before delivering
-
-Mandatory in every mode, including embedded. These patterns are what fluent generation produces by default, so they are only ever caught on reread. Answer all three against your own output:
-
-1. **What still marks this as AI-generated?** Scan specifically for negative parallelism, em dashes, participle padding, and rule-of-three. Those four survive most first passes.
-2. **Does it state any fact, name, number, date, or citation that is not in the source?** If yes, remove it.
-3. **The litmus test.** Does this sound like something the author would actually write, or like a machine working hard to imitate them? If it feels forced, pull back. Inhabit the voice instead of performing it.
-
-Fix what you find, then deliver. Do not report the self-check unless you are in audit mode.
-
-# Audit output
-
-Rewritten text first. Then:
+The rewritten text first, then a short log:
 
 ```
 ### Changes
-
 | Where | Tell | Fix |
-|-------|------|-----|
-| ¶2 | Negative parallelism | Deleted the negated half, kept the claim |
-| ¶5 | Participle padding | Cut "underscoring its importance" |
+|---|---|---|
+| ¶2 | Not X but Y | Deleted the negated half |
+| ¶4 (x3) | Participle tail | Cut the tails |
 
-Left alone: <anything that looked like a tell but was the author's voice>
+Voice: <metrics that moved into range, or "n/a">
+Left alone: <things that looked like tells but are the author's>
 ```
 
-Keep the log short. Group repeated fixes into one row with a count.
+Group repeated fixes into one row with a count.
 
-# Rules
+## Rules
 
-- Never change what the text means in order to make it sound better.
-- Never mechanically find-and-replace. Swapping every em dash for a comma is its own tell, and so is deleting every instance of a banned word without rereading the sentence.
-- Do not over-correct into choppy terseness. That is the other failure mode and it is just as recognizable.
-- In generate mode, deliver the piece alone. No preamble about what you wrote, no offer to revise.
-- If the user's own voice profile contradicts a rule here, the profile wins.
+- Never change what the text means to make it sound better.
+- Never find-and-replace. Every change is a rewrite of the sentence, reread in place.
+- Don't over-correct into choppy terseness; that's the other recognisable failure.
+- In generate mode, deliver the piece alone: no preamble, no offer to revise.
+- When the author's samples contradict a rule here, the samples win.
