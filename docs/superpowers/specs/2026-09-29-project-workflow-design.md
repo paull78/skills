@@ -39,7 +39,7 @@ The user normally types one command, `/project-time`, and the workflow works out
 | 16 | Wrap happens on the branch, before merge | The archive and the memory consolidation land in the branch diff and get reviewed with the PR; `main` never carries a `docs/current/`. |
 | 17 | Cross-project lessons go to `~/.claude/project-lessons.md`, one user approval per lesson | Lessons about the user or their tools outlive the project. Claude's own auto-memory is scoped per directory, so it can't carry them. |
 | 18 | `docs/memory/overview.md` is updated at every wrap | Once the first spec is archived, something live has to describe the system as a whole for the next feature's spec. |
-| 19 | Cycle type is inferred, not asked: `project` when project memory is empty and there is no archive, `feature` otherwise. The router states it and the user can override | Saves a question in the common case; the override covers a large rewrite in an existing repo, which needs a project-depth spec. |
+| 19 | Cycle type is inferred, not asked: `project` when the repo is blank (no archive, no tracked files outside `docs/`, `AGENTS.md`, `CLAUDE.md`, `README*`, `LICENSE*` and dotfiles), `feature` otherwise. The router states it and the user can override | Saves a question in the common case. Looking at the code, not only at memory, keeps an existing codebase that adopts the workflow from being mistaken for a new project. The override covers a large rewrite, which needs a project-depth spec. |
 
 ## Skills
 
@@ -133,8 +133,9 @@ Scanned PDFs are rejected with a clear error, not OCR'd.
 
 ## Cycles and branches
 
-- `docs/current/` absent: the router starts a new cycle. It asks for a short name (the slug) and infers the type: `project` if `docs/memory/` has no entries beyond the empty skeleton and `docs/archive/` is empty or missing, `feature` otherwise. It states the inferred type in one line ("Starting feature cycle `import`; say so if this is a project-level rewrite") and moves on unless the user overrides.
-- If the repo already has cycles behind it and the current branch is the default branch, the router offers to create `feature/<slug>`, whatever the type. The first project cycle may stay on the default branch.
+- `docs/current/` absent: the router starts a new cycle. It asks for a short name (the slug) and infers the type: `project` if the repo is blank (`docs/archive/` empty or missing, and `git ls-files` shows nothing outside `docs/`, `AGENTS.md`, `CLAUDE.md`, `README*`, `LICENSE*` and dotfiles), `feature` otherwise. It states the inferred type in one line ("Starting feature cycle `import`; say so if this is a project-level rewrite") and moves on unless the user overrides.
+- If the repo is not blank and the current branch is the default branch, the router offers to create `feature/<slug>`, whatever the type. A blank repo's first cycle may stay on the default branch.
+- Whatever the type, the first wrap in a repo creates project memory and `overview.md`; later wraps update them.
 - The spec header records the cycle: `Cycle: import · Type: feature · Branch: feature/import · Status: draft`.
 - Only one cycle can be active per branch. Two features in progress means two branches or worktrees.
 - If the router or build finds `docs/current/` on the default branch after a feature cycle's branch was merged unwrapped, it warns and offers to wrap it there.
@@ -144,7 +145,7 @@ Scanned PDFs are rejected with a clear error, not OCR'd.
 | | `project` | `feature` |
 |---|---|---|
 | Typical case | First cycle in a repo, or a large rewrite (override) | Any later cycle that adds to or changes what exists |
-| Starting knowledge | Project memory empty (or read, for a rewrite) | Project memory, `overview.md` and the codebase are read before the first question |
+| Starting knowledge | Blank repo, empty memory (a rewrite reads existing memory and code) | Project memory, `overview.md` and the codebase are read before the first question |
 | Spec depth | Full: every section, the whole decision tree | Lighter: goal, affected areas, behaviour, AC, testing, non-goals; skips what project memory already settles |
 | At wrap | Consolidation creates project memory and `overview.md` (for a rewrite, reworks them) | Consolidation updates them and applies overrides |
 
