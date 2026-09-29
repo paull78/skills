@@ -9,7 +9,9 @@ Closes a cycle. Turns what's scattered across memory and plan into a recap a per
 
 Follow the conventions in the project-time block of `AGENTS.md`. If `docs/current/` is missing, there's nothing to wrap: say so.
 
-**Modes.** Every step `[x]` → full wrap. Otherwise, or when the user asks for "a recap" or "where do we stand" → interim recap: write section 2 only, commit it as `<slug>: interim recap`, and stop.
+**Modes.** Every step `[x]`, or `Current:` starts with `wrap:` → full wrap. Otherwise, or when the user asks for "a recap" or "where do we stand" → interim recap: write section 2 only, commit only `recap.md` as `<slug>: interim recap`, and stop. If the user explicitly asks to close the cycle with steps left, list them, write a `decision` entry, and run the full wrap; the open steps go under Open issues in the recap.
+
+Track progress in the plan INDEX `Current:`: `wrap: gate passed`, `wrap: recap written`, `wrap: memory consolidated`, `wrap: lessons done`. On entry, continue from the first unfinished section. Never copy an entry whose ID already exists in `docs/memory/`, and never append a lesson already in the file.
 
 ## 1. Final gate
 
@@ -17,7 +19,8 @@ Follow the conventions in the project-time block of `AGENTS.md`. If `docs/curren
 2. Run the full test command from the plan INDEX and show the result.
 3. Check every acceptance criterion in the spec against the running code, struck-through ones excluded. List any that fail.
 4. List every `manual:` item not already confirmed at a milestone gate.
-5. Wait for the user's go-ahead.
+5. If a test or acceptance criterion fails, or the user rejects a manual check, stop: write an `issue` entry and invoke `project-plan` in update mode to add a fix step. `project-build` brings the cycle back here.
+6. Wait for the user's go-ahead. On the go-ahead, mark the last milestone `✅ gate passed <YYYY-MM-DD>` in the plan INDEX; it's committed with the wrap.
 
 ## 2. Recap
 
@@ -78,4 +81,4 @@ When the file passes about 100 lines, group the lines under topic headings.
 
 ## 5. Archive
 
-`git mv docs/current docs/archive/<YYYY-MM-DD>-<slug>` with today's date, then commit everything as `<slug>: wrap`. Don't push, don't merge. Tell the user the cycle is closed, the branch is ready to merge, and the next `/project-time` starts a new cycle.
+`git mv docs/current docs/archive/<YYYY-MM-DD>-<slug>` with today's date, then commit everything as `<slug>: wrap`. Don't push, and don't merge the branch into the default branch. Tell the user the cycle is closed, the branch is ready to merge, and the next `/project-time` starts a new cycle.

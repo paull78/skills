@@ -5,7 +5,7 @@ source "$(dirname "$0")/lib.sh"
 new_scratch
 turn "/project-time new project, slug wordfreq. I'll describe it when you ask."
 
-assert_grep AGENTS.md '<!-- project-time:start v1 -->'
+assert_grep AGENTS.md '<!-- project-time:start v2 -->'
 assert_grep AGENTS.md '<!-- project-time:end -->'
 assert_grep CLAUDE.md '^@AGENTS.md$'
 assert_file docs/memory/INDEX.md

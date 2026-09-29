@@ -81,14 +81,14 @@ Archive folders are named by date and slug, not by number, because numbers would
 
 ## The AGENTS.md block
 
-Written by setup between `<!-- project-time:start v1 -->` and `<!-- project-time:end -->`. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
+Written by setup between `<!-- project-time:start v2 -->` and `<!-- project-time:end -->`. Version 2 adds the full commit list, the pin line format and the no-cycle pin rule. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
 
 - The docs layout above, in brief.
 - At session start: read `docs/memory/INDEX.md`, and if `docs/current/` exists, `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`.
 - Memory rules: when to write, entry format, ID scheme, supersede instead of delete, cycle overrides project, pins go straight to the index.
 - "Pin this" or "remember this" from the user creates a pinned entry immediately.
 - Write memory only to `docs/current/memory/`. Project memory changes only at wrap.
-- Commit policy: one commit per finished step, never push.
+- Commit policy: commits at setup, cycle start, gates, each finished build step, spec amendments, plan updates, parallel-run start and record, interim recaps, and wrap, each with only the files that step touched. Never push, and never merge a feature branch into the default branch.
 - Sub-agents never write under `docs/`.
 - To continue work, run `/project-time`.
 
@@ -168,7 +168,7 @@ A feature can still change a project-level rule; it does it through an override 
 | Spec missing or `Status: draft` | `project-spec` (resumes from open questions) |
 | Spec `approved`, plan missing or `draft` | `project-plan` |
 | Plan `approved`, steps left | `project-build` |
-| All steps done, no recap | `project-wrap` |
+| Every step `[x]`, or `Current:` starts with `wrap` | `project-wrap` |
 
 The router invokes the phase skill with the Skill tool rather than reading its file, so the phase counts as invoked and survives compaction.
 
@@ -184,7 +184,7 @@ The router invokes the phase skill with the Skill tool rather than reading its f
 
 **Spec sections:** Goal, Users, Scope and non-goals, Behaviour (user-visible scenarios), Data, Constraints, Architecture, Acceptance criteria (`AC-01`...), Testing approach, Open questions. Feature specs may drop sections that don't apply; acceptance criteria and testing approach are never dropped.
 
-**Amend mode.** Invoked during build when the user wants to change the spec. It edits the spec, notes the amendment in the header, writes a `pivot` entry, then hands off to `project-plan` to update affected steps that haven't started. Gate 0 is re-confirmed lightly: one recap of the change and the user's OK.
+**Amend mode.** Invoked during build when the user wants to change the spec. It edits the spec, notes the amendment in an `## Amendments` section at the end of the spec, writes a `pivot` entry, then hands off to `project-plan` to update affected steps that haven't started. Gate 0 is re-confirmed lightly: one recap of the change and the user's OK.
 
 ## project-plan
 
@@ -215,7 +215,7 @@ Status marks: `[ ]` todo, `[~]` in progress, `[x]` done, `[!]` blocked (with a p
 
 **Parallel marks.** Dependencies are always recorded. Two steps get `∥` only if neither needs the other and their "Files touched" lists don't overlap.
 
-**Gates.** Every milestone ends in one. The user can ask for extra gates anywhere.
+**Gates.** Every milestone ends in one. The last milestone's gate is `project-wrap`'s final gate, so build runs no gate for it. The user can ask for extra gates anywhere.
 
 **Changing the plan during build.** Only steps not yet started get edited. Each change gets a `pivot` entry and a note in the index. Finished steps are never rewritten.
 
@@ -252,7 +252,7 @@ When pausing mid-step, or after notable progress inside a long step, update the 
 
 ## project-wrap
 
-1. **Final gate.** Full suite green, every `AC-xx` checked against the spec, `manual` items confirmed by the user. For a feature, first rebase onto the target branch so consolidation merges into the latest project memory.
+1. **Final gate.** Full suite green, every `AC-xx` checked against the spec, `manual` items confirmed by the user. For a cycle on a branch other than the default one, first bring the branch up to date so consolidation merges into the latest project memory: the user chooses rebase or merge, and merge is recommended if the branch has been pushed.
 2. **Recap**, into `docs/current/recap.md`, built from memory and plan rather than from the chat:
    - What was built, against the spec, with deviations and why.
    - How it went: milestones with dates, and the pivot chain (what we believed, what changed our mind, what we did).

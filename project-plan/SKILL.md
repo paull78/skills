@@ -9,9 +9,9 @@ Writes `docs/current/plan/`: an `INDEX.md` progress board and one file per step.
 
 Follow the conventions in the project-time block of `AGENTS.md`. If `docs/current/spec.md` is missing, invoke `project-time`.
 
-**Modes.** No plan, or plan `Status: draft` → new plan. Plan approved and called after a spec amendment or a pivot → update mode (last section).
+**Modes.** No plan, or plan `Status: draft` → new plan. Plan `Status: approved` → update mode (last section).
 
-**Precondition.** The spec should be `Status: approved`. If it isn't, say so and ask. If the user insists on planning anyway, write a `decision` entry recording that Gate 0 was skipped and why.
+**Precondition.** The spec should be `Status: approved`. If it isn't, say so and ask. If the user insists on planning anyway, write a `decision` entry recording that Gate 0 was skipped and why, and set the spec to `Status: approved`.
 
 ## 1. Read
 
@@ -70,7 +70,7 @@ Current: step 01 (not started). Last stop: none.
 ## Notes
 ```
 
-Marks: `[ ]` todo, `[~]` in progress, `[x]` done, `[!]` blocked, followed by `→ <issue id>`. A passed gate reads `✅ gate passed <YYYY-MM-DD>` in place of `⛔ gate pending`.
+Marks: `[ ]` todo, `[~]` in progress, `[x]` done, `[!]` blocked, followed by `→ <issue id>`. A passed gate reads `✅ gate passed <YYYY-MM-DD>` in place of `⛔ gate pending`. The last milestone's gate is `project-wrap`'s final gate.
 
 ### plan/step-NN-<name>.md
 
@@ -105,8 +105,9 @@ For a declared exception, Tests to write first holds one line instead: `Exceptio
 
 After a spec amendment, or a pivot found during the build:
 
-1. Change only steps marked `[ ]`. Done and in-progress steps are never rewritten; if one needs rework, add a new step for it.
-2. New steps take the next free number and sit in the INDEX in execution order, so the numbers in the list needn't be sequential.
-3. Re-check dependencies and `∥` marks for everything touched, and redo the AC mapping.
-4. Add a line under `## Notes`: `- <YYYY-MM-DD> · plan updated: <what changed> · see <memory id>`. Write a `pivot` entry if the amendment didn't already.
-5. Show the user the change and ask for OK. Commit as `<slug>: plan updated`, then return to `project-build`.
+1. Set the INDEX Last stop to `updating plan: <gist>` first.
+2. Change only steps marked `[ ]`. Done and in-progress steps are never rewritten; if one needs rework, add a new step for it. An in-progress step may be narrowed to what's already done, with the rest moved to a new step. A `[ ]` step the change makes obsolete is removed from the INDEX and its file deleted, with the reason in the Notes line.
+3. New steps take the next free number and sit in the INDEX in execution order, so the numbers in the list needn't be sequential.
+4. Re-check dependencies and `∥` marks for everything touched, and redo the AC mapping. If the spec's `Test command:` changed, update `Test:` in the INDEX header.
+5. Add a line under `## Notes`: `- <YYYY-MM-DD> · plan updated: <what changed> · see <memory id>`. Write a `pivot` entry if the amendment didn't already.
+6. Show the user the change and ask for OK. Set Last stop to `plan updated: <gist>`. Commit only `docs/current/plan/` and cycle memory as `<slug>: plan updated`, then return to `project-build`.

@@ -21,7 +21,7 @@ Every piece of work is a **cycle**: the first build of a new project, or a featu
 Run on every invocation. Each check is cheap; write only what is missing or outdated.
 
 1. **Git.** `git rev-parse --is-inside-work-tree`. Not a repo: offer `git init`. If the user declines, carry on and skip every commit in the workflow.
-2. **AGENTS.md block.** Look for `<!-- project-time:start v1 -->` … `<!-- project-time:end -->`.
+2. **AGENTS.md block.** Look for `<!-- project-time:start v2 -->` … `<!-- project-time:end -->`.
    - No block: append the block from the Templates section, creating `AGENTS.md` if needed.
    - Older version marker, or text that differs from the template: replace everything between the markers, markers included.
    - Identical: leave it alone.
@@ -40,7 +40,7 @@ Read the `Status:` field in the headers of `docs/current/spec.md` and `docs/curr
 | Spec `Status: draft` | Invoke `project-spec` |
 | Spec `approved`, plan missing or `Status: draft` | Invoke `project-plan` |
 | Plan `approved`, any step not `[x]` | Invoke `project-build` |
-| Every step `[x]` | Invoke `project-wrap` |
+| Every step `[x]`, or `Current:` starts with `wrap` | Invoke `project-wrap` |
 
 Before routing, compare the spec header's `Branch:` with the current branch. If they differ, stop and explain: either the user switched branches, or a branch was merged without wrapping. Ask how to proceed, and offer to wrap the cycle here.
 
@@ -50,7 +50,7 @@ If the user asks for something specific, route to its owner instead: "reopen" or
 
 ## 3. Start a new cycle
 
-1. **Slug.** Ask for a short kebab-case name, or propose one from the user's message. It prefixes memory IDs and commit messages, so keep it short.
+1. **Slug.** Ask for a short kebab-case name, or propose one from the user's message. It prefixes memory IDs and commit messages, so keep it short. It must not match a slug under `docs/archive/` or an ID prefix in `docs/memory/`.
 2. **Type.** Infer it, don't ask. The repo is **blank** when `docs/archive/` is missing or empty and `git ls-files` lists nothing outside `docs/`, `AGENTS.md`, `CLAUDE.md`, `README*`, `LICENSE*` and dotfiles.
    - Blank → `project`. Not blank → `feature`.
    - State it in one line and carry on: "Starting feature cycle `import`. Say so if this is a project-level rewrite." A user override to `project` in a non-blank repo means a rewrite: a full-depth spec that still reads existing memory and code.
@@ -60,15 +60,15 @@ If the user asks for something specific, route to its owner instead: "reopen" or
 
 ## Templates
 
-### AGENTS.md block (v1)
+### AGENTS.md block (v2)
 
 ```markdown
-<!-- project-time:start v1 -->
+<!-- project-time:start v2 -->
 ## Project workflow (project-time)
 
 This repo runs the project-time workflow. Its state lives in `docs/`: the files are the source of truth, the conversation is scratch.
 
-- `docs/memory/`: project memory. Read it; only `project-wrap` changes it.
+- `docs/memory/`: project memory. Read it; setup creates it and only `project-wrap` changes it.
 - `docs/current/`: the active cycle on this branch. `spec.md`, `plan/INDEX.md` with `plan/step-NN-*.md`, and `memory/` (cycle memory).
 - `docs/archive/<date>-<slug>/`: finished cycles.
 
@@ -76,7 +76,7 @@ This repo runs the project-time workflow. Its state lives in `docs/`: the files 
 
 **Memory.** Record in `docs/current/memory/` as soon as it happens, before moving on:
 - a decision (with the why and the rejected options), a discovery, a pivot, an issue;
-- anything the user asks to pin or remember: a one-liner with an ID under `## Pinned` in the cycle memory INDEX.
+- anything the user asks to pin or remember: a one-liner under `## Pinned` in the cycle memory INDEX, as `- <slug>.<NN> · <the rule>`. With no active cycle, a pin waits for the next cycle: say so.
 
 Entries go in area files by topic, each area listed in one line in the INDEX:
 
@@ -84,9 +84,9 @@ Entries go in area files by topic, each area listed in one line in the INDEX:
     <the fact>
     **Why:** <reason; rejected options>
 
-NN is the highest number in the cycle plus one. Never delete an entry. A pivot adds a new entry marked `Supersedes <id>` and appends `Superseded by <id>` to the old one. If the old one is in project memory, add `- <old> → <new> · <one line>` under `## Overrides` in the cycle INDEX instead. Cycle memory wins over project memory while the cycle is active. Pins from both indexes apply.
+NN is the highest number in the cycle plus one, pins included. Never delete an entry. A pivot adds a new entry marked `Supersedes <id>` and appends `Superseded by <id>` to the old one. If the old one is in project memory, add `- <old> → <new> · <one line>` under `## Overrides` in the cycle INDEX instead. Cycle memory wins over project memory while the cycle is active. Pins from both indexes apply.
 
-**Commits.** The workflow commits at setup, cycle start, each gate, each finished build step, and wrap. Never push.
+**Commits.** The workflow commits at setup, cycle start, gates, each finished build step, spec amendments, plan updates, parallel-run start and record, interim recaps, and wrap, each with only the files that step touched. Messages start with `<slug>:` or `<slug> step NN:`. Never push, and never merge a feature branch into the default branch.
 
 **Sub-agents** never write under `docs/`. They report back; the main agent records.
 

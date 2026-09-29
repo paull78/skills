@@ -15,7 +15,7 @@ Follow the conventions in the project-time block of `AGENTS.md` (layout, memory 
 
 - Read the spec header (`Type:`), the whole spec if resuming, both memory indexes, and `~/.claude/project-lessons.md` if it exists. Apply relevant lessons, and say so when one shapes a recommendation.
 - If the repo has code: read `docs/memory/overview.md`, then explore the parts of the codebase the work touches. Never ask what the repo already answers.
-- **Resuming:** say in two lines where things stand, then continue from the first item under Open questions.
+- **Resuming:** say in two lines where things stand, then continue from the first item under Open questions. If Open questions is `- none`, go to section 3.
 - **New:** ask the user to describe the project or feature in their own words, unless they already have.
 
 ## 2. The interview
@@ -70,9 +70,10 @@ A `feature` spec may drop Users, Data, Constraints and Architecture when they do
 
 For an approved spec the user wants to change, usually mid-build.
 
-1. Ask what changes and why, one question at a time, until the change is clear.
-2. Edit the affected sections. New acceptance criteria take the next free number; removed ones are struck through (`~~AC-04 · ...~~`), never renumbered.
-3. Add a `## Amendments` section at the end if missing, and a line in it: `- <YYYY-MM-DD> · <what changed> · see <memory id>`.
-4. Write a `pivot` entry in cycle memory. If the change reverses a project-memory entry, add an Overrides line too.
-5. Light Gate 0: recap the change in 2 to 4 bullets and ask for OK. Commit as `<slug>: spec amended`.
-6. Invoke `project-plan` in update mode, so the steps not started yet follow the change.
+1. Set the plan INDEX Last stop to `amending spec: <gist>` before editing.
+2. Ask what changes and why, one question at a time, until the change is clear.
+3. Edit the affected sections. New acceptance criteria take the next free number; removed ones are struck through (`~~AC-04 · ...~~`), never renumbered.
+4. Add a `## Amendments` section at the end if missing, and a line in it: `- <YYYY-MM-DD> · <what changed> · see <memory id>`.
+5. Write a `pivot` entry in cycle memory. If the change reverses a project-memory entry, add an Overrides line too.
+6. Light Gate 0: recap the change in 2 to 4 bullets and ask for OK. Set Last stop to `updating plan: <gist>`. Commit only `spec.md`, the plan INDEX and cycle memory as `<slug>: spec amended`; leave other uncommitted work alone.
+7. Invoke `project-plan` in update mode, so the steps not started yet follow the change.
