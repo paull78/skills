@@ -67,7 +67,10 @@ from_snapshot() {
 # One user message. Continues the current session unless reset_session was called.
 turn() {
   local prompt="$1" out rc
+  # project,local only: skills installed in ~/.claude/skills would otherwise shadow the
+  # working copies linked into the scratch repo, and the scenarios would test the wrong code.
   local args=(-p "$prompt" --output-format json --permission-mode acceptEdits
+    --setting-sources project,local
     --add-dir "$HOME/.claude" --allowedTools "${TOOLS[@]}")
   [ -n "$SESSION" ] && args+=(--resume "$SESSION")
   rc=0

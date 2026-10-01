@@ -22,7 +22,7 @@ Snapshots live in `${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots
 
 Runs are slow and cost tokens: each `turn` is a full `claude -p` call. Run them in the background.
 
-The skills are linked into each scratch repo's `.claude/skills/`, so the scenarios test the working copy. Your user-level settings and plugins load too, which is intended: interference from them is a real finding.
+The skills are linked into each scratch repo's `.claude/skills/`, and every `claude -p` call runs with `--setting-sources project,local`, so the scenarios test the working copy even when the same skills are installed in `~/.claude/skills/` (an installed skill would otherwise win). The cost: your user-level settings and plugins don't load during scenarios.
 
 `08-wrap.sh` backs up `~/.claude/project-lessons.md` and restores it on exit, in case a run manages to write it.
 
