@@ -46,7 +46,7 @@ Before routing, compare the spec header's `Branch:` with the current branch. If 
 
 If the user asks for something specific, route to its owner instead: "reopen" or "change the spec" → `project-spec` (amend mode); "change the plan" → `project-plan` (update mode); "a recap", "where do we stand" → `project-wrap` (interim recap).
 
-**Hand off by invoking the phase skill with the Skill tool, never by reading its file.** An invoked skill survives context compaction; a file read doesn't. Pass one line of context: the cycle slug and the state you found.
+**Hand off by invoking the phase skill with the Skill tool, not by reading its file.** In Claude Code an invoked skill survives context compaction; a file read doesn't. In agents without a Skill tool (Codex and others), read the phase skill's `SKILL.md`, from the folder next to this skill's, and follow it. Pass one line of context: the cycle slug and the state you found.
 
 ## 3. Start a new cycle
 
