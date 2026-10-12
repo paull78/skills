@@ -95,7 +95,7 @@ After drafting, read the catalogue for the draft's language: `references/tells-e
 These count on one sighting, and they're the ones that survive first passes:
 
 - **Not X but Y** in any costume: "It's not X, it's Y", "Not only X but Y", "Stop X. Start Y", "Y rather than X", "It asks no permission", the version split across two sentences, the tail ", no guessing, no friction". Delete the negated half, unless the reader really holds X or X is the author's own former view.
-- **Dramatic closers and fragment rows**: a one-line moral, "The result?", "Enter X.", "That distinction matters."
+- **Dramatic closers, fragment rows and payoff tails**: a one-line moral, "The result?", "Enter X.", "That distinction matters.", and the clause that lands a moral at the end of a long sentence (", and then measuring whether each piece earns its place", ", then seeing what actually holds up"). Stop at the thing, or give the second act its own sentence with a finite verb. Swapping the idiom ("is worth keeping") leaves the tail in place.
 - **Aphorisms and invented concept labels**: "X is the language of Y", "the acceleration trap".
 - **Staged run-ups and staged candor**: "Here's the thing", "Honestly?", "Look,", "Worth stating plainly".
 - **Arguing with no one and method narration**: "A tempting approach would be...", "Anything unconfirmed is flagged rather than guessed."
@@ -126,7 +126,7 @@ The date check: ChatGPT went public on 30 November 2022. Text written before tha
 
 Mandatory in every mode, including embedded, because these patterns are what fluent generation produces by default and only a reread catches them:
 
-1. Which one-sighting tells from section 5 are still there? Look hardest for not-X-but-Y, closers, dashes and invented specifics.
+1. Which one-sighting tells from section 5 are still there? Look hardest for not-X-but-Y, closers and payoff tails, dashes and invented specifics.
 2. Does the text state any fact, name, number, date or source that isn't in the material? Remove it.
 3. For a voiced piece: is every metric in range, and does the draft do anything the matching samples never do? Is there a word, idiom or stock formula this author wouldn't reach for? Compare against the phrase bank.
 4. Does it sound like something this author would write, or like a model working hard to imitate them? If it feels performed, pull back toward the samples.

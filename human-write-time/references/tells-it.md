@@ -8,7 +8,8 @@ Italian needs its own list. Some English tells carry over, some don't, and some 
 
 - Negazione-correzione (not X but Y). Stronger in Italian: measured near 3 times the human rate in oratory. "Non è solo tecnologia. È una rivoluzione." "Non si tratta solo di X, ma di Y." "Questo non è X, è Y." "Non X, ma Y." Esposito's alarm threshold: three or four in 300 words. Fix: keep only the affirmative half, unless the reader really holds X.
 - Triadi everywhere, summary closers, title case, bullets and bold labels, emoji, significance inflation, participle tails (here as gerunds: ", evidenziando l'importanza", ", sottolineando come").
-- Dramatic closers, aphorisms, staged candor ("Diciamocelo:", "Ecco il punto:", "La verità?"), fake questions ("Il risultato?").
+- Dramatic closers, aphorisms, staged candor ("Diciamocelo:", "Ecco il punto:", "La verità?"), fake questions ("Il risultato?"). The payoff tail inside a sentence: ", per poi misurare se ogni pezzo si guadagna il suo posto", ", per poi vedere cosa regge davvero", ", chiedendosi se ne valesse la pena". Stop at the thing, or give the second act its own sentence with a finite verb.
+- Merit idioms for components ("si guadagna il posto", "fa il grosso del lavoro", "si ripaga da solo", "si merita di restare") and borrowed genre frames ("uno studio su", "un esercizio di", "una riflessione su") on a technical project. Say what the piece does or what was measured.
 - Chat residue: "Ottima domanda!", "Spero di esserti stato utile", "Fammi sapere se...".
 
 ## A. Strong in Italian

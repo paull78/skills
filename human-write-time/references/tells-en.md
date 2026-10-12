@@ -4,7 +4,7 @@ Read this after drafting, never before. Naming a phrase primes it, so the draft 
 
 How to use it:
 
-- Hunt shapes, not strings. A banned word swapped for a synonym is the same tell ("tapestry" to "mosaic", "it's important to note" to "keep in mind"). A not-X-but-Y rewritten into two sentences is still not-X-but-Y.
+- Hunt shapes, not strings. A banned word swapped for a synonym is the same tell ("tapestry" to "mosaic", "it's important to note" to "keep in mind", "earns its place" to "is worth keeping"). A not-X-but-Y rewritten into two sentences is still not-X-but-Y.
 - Calibrate, don't eliminate. The target is the author's rate, which for most shapes is low but not zero. People use contrast, triads and dashes too; machines use them everywhere.
 - Section A tells count on one sighting. Everything else counts only in clusters: three in a paragraph means something, one on a page means a person wrote a sentence.
 - A banned word used in its literal sense is fine. "Robust standard errors" is statistics, "harness" is equipment, "align the columns" is an instruction.
@@ -32,6 +32,13 @@ A one-line paragraph that lands the moral. A row of fragments. "The result?" "Th
 > After: AlphaEvolve changed the search because it did not favor symmetry or human-looking designs.
 
 Fix: fold the point into the sentence that earns it, or stop one sentence earlier.
+
+**The payoff tail** is the same move inside one sentence: a long description of the thing, a comma, then a clause that lands its moral. ", and then measuring whether each piece earns its place." ", then seeing what actually holds up." ", and asking whether any of it was worth it." ", to find out what survives contact with real data." The sentence had already said what the thing is; the tail tells the reader how to feel about it, usually by awarding the project a virtue (rigour, honesty, restraint). The "and then" plus a gerund is the usual hinge, but a "to" infinitive, a past participle (", and then stress-tested against...to see what holds up") or a bare ", asking" does the same job.
+
+> Before: ...a from-scratch, dependency-light study in building a production-shaped RAG pipeline on a strict Clean Architecture skeleton, and then measuring whether each piece earns its place.
+> After: ...a RAG pipeline built from scratch, with few dependencies, on a strict Clean Architecture skeleton. The pipeline is then measured with and without each component.
+
+Fix: stop at the thing, or give the second act its own sentence with a subject, a finite verb and the concrete object (what is measured, against what). Trading "earns its place" for "is worth keeping" or "justifies itself" leaves the tail intact.
 
 ### A3. Aphorisms and invented concept labels
 
@@ -82,6 +89,8 @@ The vocabulary drifts with each model generation, so treat these as families, no
 - Hype: revolutionize, game-changer, cutting-edge, groundbreaking, unlock, unleash, supercharge, transformative, unprecedented.
 - Puffery: unparalleled, renowned, breathtaking, stunning, nestled, iconic, commendable, visionary.
 - Claude-isms: load-bearing, quietly, genuinely, plainly, seam, sidecar, surface (as a verb), provenance, shipped, belt and suspenders, smoking gun, "that's the unlock", "and the trap is", "carry the argument", "X makes itself", "full stop".
+- Merit idioms for parts of a system: "earns its place", "earns its keep", "pulls its weight", "pays for itself", "does the heavy lifting", "does real work", "has to justify itself", "whether X *actually* helps" (the "actually" is the posture). The component is awarded a virtue instead of a measurement. Say what it does or what was measured, or cut. Models also hand a project a stance toward itself ("honest about", "unapologetically", "opinionated"), which is the same move one level up.
+- Coinages: "-shaped" ("production-shaped", "problem-shaped", "the shape of the work"), and "-light", "-first", "-grade", "-aware", "-heavy", "-native", "zero-" compounds built for the sentence. Genre frames borrowed from essays and art and dropped on a technical project: "a study in X", "an exercise in X", "a meditation on X", "a love letter to X". Use the plain description: "built from scratch with few dependencies", "like a production system".
 - Throat-clearing: "it's worth noting", "it's important to note", "what makes this interesting is", "at its core", "the real question is".
 - Dead transitions: furthermore, moreover, additionally, that said, with that in mind. (Check the author: "Moreover" can be theirs.)
 - Bloat: "in order to", "due to the fact that", "at this point in time", "a wide variety of".
@@ -91,9 +100,11 @@ Fix: the plain word, or the verb. Never a synonym of the same weight.
 
 ## C. Syntactic
 
-- Participle tails: ", highlighting its importance", ", reflecting broader trends", ", symbolizing the shift". Measured at 5 times the human rate. Cut, or give the claim its own sentence.
+- Participle tails: ", highlighting its importance", ", reflecting broader trends", ", symbolizing the shift". Measured at 5 times the human rate. Cut, or give the claim its own sentence. When the tail is coordinated (", and then measuring whether...") and lands a moral, it is the payoff tail in A2 and counts on one sighting.
   > Before: ...symbolizing Texas bluebonnets, the Gulf of Mexico, and the diverse Texan landscapes, reflecting the community's deep connection to the land.
   > After: ...colors meant to evoke Texas bluebonnets and the Gulf of Mexico.
+- Hyphen stacks: two or more hyphenated compound modifiers on one noun. "a from-scratch, dependency-light study", "a small, dependency-free, single-file script", "a production-shaped, test-first pipeline". One compound is ordinary English (section G), and domain terms used literally ("type-safe", "schema-first", "open-source") don't count toward the stack; the stack is a sentence's worth of claims packed into adjectives built for the occasion. Unpack those into phrases or a clause: "built from scratch, with few dependencies".
+- Colon-appositive openers: a short label, a colon, then a long appositive that carries the whole content. "This is a personal learning project: a from-scratch, dependency-light study in building..." Common as the first line of a README, bio or product page. The colon splices a second sentence onto the first and leaves the project without a verb. Give the appositive its own sentence: "This is a personal learning project. It builds..."
 - Copula avoidance: "serves as", "stands as", "boasts", "features", "represents". Say is, has.
   > Before: Gallery 825 serves as the gallery's exhibition space, features four separate spaces and boasts over 3,000 square feet.
   > After: Gallery 825 is the gallery's exhibition space. It has four rooms totaling 3,000 square feet.
@@ -124,6 +135,7 @@ When the shape is the problem, fixing sentences won't help. Restructure first.
 - Stacked qualifiers ("could potentially be argued"). Note that models use fewer real hedges and opinions than people do, so honest first-person stance ("I think this is wrong") is a human marker, not a tell.
 - Gap-filling guesses dressed as knowledge: "the team likely struggled", "she probably grew up".
 - Sales register in a technical or personal text.
+- Modesty as a run-up: "a personal learning project", "a weekend experiment", "a small side project", "a humble attempt", hinged to a spec sheet of production features in the same sentence. The humble label is a fact about how the thing was made; the hinge is the posture. Keep both facts, drop the hinge: the label in one sentence, what the thing does in the next, without the colon or the "but".
 - Creative prose: ghosts, whispers, the "soft hum" of anything, silence that "speaks", abstractions given senses (grief that "tastes").
 
 ## F. Formatting
@@ -145,7 +157,7 @@ Count these only alongside stronger tells. They are ordinary human writing on th
 - Em dashes. Claude still overuses them (about 9 per 1,000 words against a human 3), so remove them in Claude output, but a text without dashes proves nothing and one dash proves nothing. Remove by restructuring: split the sentence, or use and, but, so, or parentheses where the author uses them. Never swap every dash for a colon or semicolon; that's a Claude-ism too ("X exists in theory; in practice, Y").
 - Passive voice. People use agentless passives about twice as often as GPT-4o. Don't convert them on principle.
 - Elegant variation (synonym cycling) and false ranges ("from startups to enterprises"). Newer models rarely do either; treat them as historical.
-- Hedges, hyphenated pairs, curly quotes, formal vocabulary used accurately.
+- Hedges, a single hyphenated compound (the stack is section C), curly quotes, formal vocabulary used accurately.
 
 ## H. Fixes that backfire
 
