@@ -19,7 +19,7 @@ Italian needs its own list. Some English tells carry over, some don't, and some 
 - Everything epochal: "tutto è epocale, clamoroso e importantissimo" (Il Post). fondamentale, cruciale, essenziale, imprescindibile, rivoluzionario, "un vero e proprio", "una testimonianza di", "un monumento a".
 - Cerchiobottismo: the fixed shape "affermazione positiva, ma limitazione", balancing every claim so as never to commit. Take the position the material supports.
 - Barnum statements: "Ogni azienda merita una strategia su misura." True of everything, so it says nothing. Add the specific case or cut.
-- A mandatory "Conclusioni" section, or "In conclusione," opening the last paragraph.
+- A mandatory "Conclusioni" section, or "In conclusione," opening the last paragraph. The inventory sentence opening a section: "Questa sezione è il resoconto di quel lavoro: lo strumento, i numeri di partenza e tre prove, una delle quali ha cambiato un default." Delete it and start with the first item.
 
 > Prima: In un panorama in continua evoluzione, la gestione delle dipendenze non è solo un'attività tecnica, ma un fattore cruciale per il successo del team. Inoltre, è importante sottolineare come Lockstep rappresenti una soluzione innovativa.
 > Dopo: Aggiornare le dipendenze è la parte più lenta della nostra settimana, quindi abbiamo scritto Lockstep.

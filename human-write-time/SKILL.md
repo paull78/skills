@@ -99,7 +99,7 @@ These count on one sighting, and they're the ones that survive first passes:
 - **Aphorisms and invented concept labels**: "X is the language of Y", "the acceleration trap".
 - **Staged run-ups and staged candor**: "Here's the thing", "Honestly?", "Look,", "Worth stating plainly".
 - **Arguing with no one and method narration**: "A tempting approach would be...", "Anything unconfirmed is flagged rather than guessed."
-- **Preview, recap and a takeaway on every section.**
+- **Preview, recap and a takeaway on every section**, including the inventory sentence that opens a section with a colon and a list of its contents ("This section is the record of that work: the instrument, the starting numbers, and three trials, of which one changed a default."). Delete it and start with the first item.
 - **Chat residue**: "Great question", "I hope this helps", "Let me know if".
 - **Em dashes in Claude output**: remove them by restructuring (split the sentence, use and/but/so, or parentheses if the author uses them). Never swap them all for colons or semicolons. In Italian, follow the author's punctuation, including spaced en dashes if they use them.
 - **Invented specifics**: any fact, number, name, quote or source not in the material.

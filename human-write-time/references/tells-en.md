@@ -38,7 +38,9 @@ Fix: fold the point into the sentence that earns it, or stop one sentence earlie
 > Before: ...a from-scratch, dependency-light study in building a production-shaped RAG pipeline on a strict Clean Architecture skeleton, and then measuring whether each piece earns its place.
 > After: ...a RAG pipeline built from scratch, with few dependencies, on a strict Clean Architecture skeleton. The pipeline is then measured with and without each component.
 
-Fix: stop at the thing, or give the second act its own sentence with a subject, a finite verb and the concrete object (what is measured, against what). Trading "earns its place" for "is worth keeping" or "justifies itself" leaves the tail intact.
+The teaser form promises a reveal instead of awarding a virtue: ", of which one changed a default", ", one of which surprised us", ", and one that didn't survive". It turns a list into a trailer.
+
+Fix: stop at the thing, or give the second act its own sentence with a subject, a finite verb and the concrete object (what is measured, against what). Trading "earns its place" for "is worth keeping" or "justifies itself" leaves the tail intact. A teaser goes where the thing it teases is described, or nowhere.
 
 ### A3. Aphorisms and invented concept labels
 
@@ -58,7 +60,7 @@ Fix: say the concrete claim underneath. If there is none, cut.
 
 ### A5. Arguing with no one, method narration, reasoning leaks
 
-Rebutting an alternative nobody proposed: "A tempting approach would be to X, but...", "I'm not saying X." Narrating the method instead of doing it: "Anything unconfirmed is flagged rather than guessed." "What it changes is worth being precise about." "To be clear," "Let me be precise."
+Rebutting an alternative nobody proposed: "A tempting approach would be to X, but...", "I'm not saying X." Narrating the method instead of doing it: "Anything unconfirmed is flagged rather than guessed." "What it changes is worth being precise about." "To be clear," "Let me be precise." The text describing itself as an artefact: "This section is the record of that work", "What follows is an account of", "This is the story of how".
 
 Fix: state the actual design or finding. Cut the performance of carefulness.
 
@@ -66,7 +68,14 @@ Fix: state the actual design or finding. Cut the performance of carefulness.
 
 An intro announcing what the piece covers. A conclusion restating it. Summaries at every level. "So, to answer your question: yes." "In summary." "Ultimately." "At the end of the day."
 
-Fix: start with the first real thing, stop after the last one.
+**The inventory sentence** is the section-level version: a label, a colon, then a comma list of what the section contains, often with a teaser hung off the last item.
+
+> Before: This section is the record of that work: the instrument, the starting numbers, and three trials, of which one changed a default.
+> After: (deleted; the section starts with the instrument)
+
+The heading already announces the section, and the list is a table of contents dressed as a sentence. The same shape also opens paragraphs ("Three things changed: X, Y and Z.") and is the C compulsive-counting tell with the items spelled out.
+
+Fix: start with the first real thing, stop after the last one. If the reader needs a map, headings are the map.
 
 ### A7. A takeaway on every section
 
@@ -91,6 +100,7 @@ The vocabulary drifts with each model generation, so treat these as families, no
 - Claude-isms: load-bearing, quietly, genuinely, plainly, seam, sidecar, surface (as a verb), provenance, shipped, belt and suspenders, smoking gun, "that's the unlock", "and the trap is", "carry the argument", "X makes itself", "full stop".
 - Merit idioms for parts of a system: "earns its place", "earns its keep", "pulls its weight", "pays for itself", "does the heavy lifting", "does real work", "has to justify itself", "whether X *actually* helps" (the "actually" is the posture). The component is awarded a virtue instead of a measurement. Say what it does or what was measured, or cut. Models also hand a project a stance toward itself ("honest about", "unapologetically", "opinionated"), which is the same move one level up.
 - Coinages: "-shaped" ("production-shaped", "problem-shaped", "the shape of the work"), and "-light", "-first", "-grade", "-aware", "-heavy", "-native", "zero-" compounds built for the sentence. Genre frames borrowed from essays and art and dropped on a technical project: "a study in X", "an exercise in X", "a meditation on X", "a love letter to X". Use the plain description: "built from scratch with few dependencies", "like a production system".
+- Literary renaming: ordinary objects given abstract or archaic nouns, mostly in openers and closers. A script becomes "the instrument", experiments "trials", a baseline table "the starting numbers", a config file "the contract", a test suite "the harness" (when the text elsewhere says tests). Use the name the rest of the text uses.
 - Throat-clearing: "it's worth noting", "it's important to note", "what makes this interesting is", "at its core", "the real question is".
 - Dead transitions: furthermore, moreover, additionally, that said, with that in mind. (Check the author: "Moreover" can be theirs.)
 - Bloat: "in order to", "due to the fact that", "at this point in time", "a wide variety of".
@@ -105,7 +115,7 @@ Fix: the plain word, or the verb. Never a synonym of the same weight.
   > After: ...colors meant to evoke Texas bluebonnets and the Gulf of Mexico.
 - Hyphen stacks: two or more hyphenated compound modifiers on one noun. "a from-scratch, dependency-light study", "a small, dependency-free, single-file script", "a production-shaped, test-first pipeline". One compound is ordinary English (section G), and domain terms used literally ("type-safe", "schema-first", "open-source") don't count toward the stack; the stack is a sentence's worth of claims packed into adjectives built for the occasion. Unpack those into phrases or a clause: "built from scratch, with few dependencies".
 - Colon-appositive openers: a short label, a colon, then a long appositive that carries the whole content. "This is a personal learning project: a from-scratch, dependency-light study in building..." Common as the first line of a README, bio or product page. The colon splices a second sentence onto the first and leaves the project without a verb. Give the appositive its own sentence: "This is a personal learning project. It builds..."
-- Copula avoidance: "serves as", "stands as", "boasts", "features", "represents". Say is, has.
+- Copula avoidance: "serves as", "stands as", "boasts", "features", "represents". Say is, has. "Stand" as a status verb is the same family: "where it stands", "where things stand", "as it stands", "the project stands at". Say what is true now, or use "status" or "today".
   > Before: Gallery 825 serves as the gallery's exhibition space, features four separate spaces and boasts over 3,000 square feet.
   > After: Gallery 825 is the gallery's exhibition space. It has four rooms totaling 3,000 square feet.
 - Vague connection: "associated with", "linked to", "tied to", when the relation is known. Name it.
@@ -122,7 +132,7 @@ When the shape is the problem, fixing sentences won't help. Restructure first.
 - Symmetric sections, same length and same number of points each.
 - Uniform paragraph architecture: topic sentence, support, transition, every time.
 - Forced balance: equal weight to both sides when one is right.
-- Question headings on something that isn't an FAQ. Headings written for effect ("The decision, on one screen").
+- Question headings on something that isn't an FAQ. Headings written for effect ("The decision, on one screen") and stock status headings ("Where it stands", "Where things stand", "State of play", "What changed"). Name the content instead ("Open bugs", "Results after the third trial").
 - Imposed listicle: one argument chopped into "5 ways".
 - In replies: the decision buried after re-explaining context the reader already has. Put the answer first.
 
