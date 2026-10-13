@@ -66,3 +66,4 @@ Composable lenses for challenging designs against established principles. Use st
 | [knowledge-pragmatic-programmer](./knowledge-pragmatic-programmer) | Hunt & Thomas — DRY, orthogonality, tracer bullets |
 | [knowledge-fundamentals-of-sw-architecture](./knowledge-fundamentals-of-sw-architecture) | Richards & Ford — characteristics, topology, fitness functions |
 | [knowledge-pattern-language](./knowledge-pattern-language) | Christopher Alexander — forces, wholeness, emergent order |
+| [knowledge-hexagonal-architecture](./knowledge-hexagonal-architecture) | Alistair Cockburn & Juan Manuel Garrido de Paz — ports, adapters, configurator, test-first isolation. Deeper than the other lenses: reference files on pitfalls, transactions/queries/errors, per-language idioms, contract tests, boundary-enforcement tooling, and legacy migration |
