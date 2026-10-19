@@ -7,7 +7,10 @@ SCENARIOS="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SKILLS_REPO="$(cd "$SCENARIOS/../.." && pwd)"
 WORKFLOW_SKILLS=(project-time project-spec project-plan project-build project-wrap)
 SNAPSHOTS="${SCENARIO_SNAPSHOTS:-$HOME/.cache/project-workflow-snapshots}"
-LESSONS="$HOME/.claude/project-lessons.md"
+GENERAL="$HOME/.agents/memory"
+LESSONS="$GENERAL/lessons.md"
+USER_CLAUDE_MD="$HOME/.claude/CLAUDE.md"
+OLD_LESSONS="$HOME/.claude/project-lessons.md"
 TOOLS=(Read Write Edit Glob Grep Skill Agent
   "Bash(git:*)" "Bash(mkdir:*)" "Bash(ls:*)" "Bash(cat:*)" "Bash(mv:*)" "Bash(cp:*)"
   "Bash(python3:*)" "Bash(test:*)" "Bash(grep:*)" "Bash(find:*)" "Bash(wc:*)"
@@ -123,13 +126,20 @@ milestone_block() { awk -v n="$1" '/^## /{p = ($2 == "Milestone" && $3 == n)} p'
 # The full test command from the plan index header.
 test_cmd() { sed -nE 's/.*Test: `([^`]+)`.*/\1/p' docs/current/plan/INDEX.md | head -1; }
 
-# Keep the real ~/.claude/project-lessons.md out of the tests' reach.
-protect_lessons() {
-  LESSONS_BACKUP="$(mktemp)"
-  if [ -f "$LESSONS" ]; then cp "$LESSONS" "$LESSONS_BACKUP"; HAD_LESSONS=1; else HAD_LESSONS=0; fi
-  echo "lessons backup: $LESSONS_BACKUP"
-  trap restore_lessons EXIT
+# Keep the real general memory (~/.agents/memory/), ~/.claude/CLAUDE.md and the old
+# ~/.claude/project-lessons.md out of the tests' reach: setup and wrap write them.
+# Every scenario sources this file, so every run is protected.
+GENERAL_BACKUP="$(mktemp -d)"
+for p in "$GENERAL" "$USER_CLAUDE_MD" "$OLD_LESSONS"; do
+  [ -e "$p" ] && cp -R "$p" "$GENERAL_BACKUP/$(basename "$p")"
+done
+restore_general() {
+  for p in "$GENERAL" "$USER_CLAUDE_MD" "$OLD_LESSONS"; do
+    rm -rf "$p"
+    [ -e "$GENERAL_BACKUP/$(basename "$p")" ] && cp -R "$GENERAL_BACKUP/$(basename "$p")" "$p"
+  done
+  return 0
 }
-restore_lessons() {
-  if [ "$HAD_LESSONS" = 1 ]; then cp "$LESSONS_BACKUP" "$LESSONS"; else rm -f "$LESSONS"; fi
-}
+trap restore_general EXIT
+# Kept for older scenario scripts; the protection above already runs.
+protect_lessons() { :; }

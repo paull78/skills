@@ -24,7 +24,7 @@ Runs are slow and cost tokens: each `turn` is a full `claude -p` call. Run them 
 
 The skills are linked into each scratch repo's `.claude/skills/`, and every `claude -p` call runs with `--setting-sources project,local`, so the scenarios test the working copy even when the same skills are installed in `~/.claude/skills/` (an installed skill would otherwise win). The cost: your user-level settings and plugins don't load during scenarios.
 
-`08-wrap.sh` backs up `~/.claude/project-lessons.md` and restores it on exit, in case a run manages to write it.
+Every scenario backs up the general memory (`~/.agents/memory/`), `~/.claude/CLAUDE.md` and the old `~/.claude/project-lessons.md`, and restores them on exit, because setup and wrap write there.
 
 ## Manual check: compaction
 
@@ -36,6 +36,6 @@ The skills are linked into each scratch repo's `.claude/skills/`, and every `cla
 4. Type `continue with the next step`.
 5. Check that it works on step 02, not step 01 again; writes and runs the tests before the implementation; gives the one-line memory checkpoint; and commits as `wordfreq step 02: ...`.
 
-## Manual check: the lessons file
+## Manual check: general memory
 
-`~/.claude/` is a protected path, so `claude -p` can't write `~/.claude/project-lessons.md` and `08-wrap.sh` only checks that the lesson was handed over. In an interactive session on a copy of the `at-final-gate` snapshot, run `/project-time`, approve the wrap and one lesson, accept the permission prompt, and check the file gets the header and exactly one lesson line. Remove or restore the file afterwards.
+A headless run may be refused writes outside the repo, so `08-wrap.sh` accepts a lesson handed over instead of written. In an interactive session on a copy of the `at-final-gate` snapshot, back up `~/.agents/memory/`, run `/project-time`, approve the wrap and one lesson, accept any permission prompt, and check that `~/.agents/memory/lessons.md` gets exactly one new line and the INDEX lists the area. Restore the folder afterwards.

@@ -37,7 +37,7 @@ The user normally types one command, `/project-time`, and the workflow works out
 | 14 | Everything is a cycle; one active cycle per branch, in `docs/current/` | A new project is the first cycle, a feature is a later one. Same skills, spec depth scales with type. Separate branches keep parallel features apart. |
 | 15 | Two-level memory: cycle memory is written during work, consolidated into project memory at wrap | Parallel branches never write the same files, so no merge conflicts; consolidation is where takeaways get distilled. |
 | 16 | Wrap happens on the branch, before merge | The archive and the memory consolidation land in the branch diff and get reviewed with the PR; `main` never carries a `docs/current/`. |
-| 17 | Cross-project lessons go to `~/.claude/project-lessons.md`, one user approval per lesson | Lessons about the user or their tools outlive the project. Claude's own auto-memory is scoped per directory, so it can't carry them. |
+| 17 | Three memory levels with one shape: cycle (`docs/current/memory/`), project (`docs/memory/`), general (`~/.agents/memory/`, machine-wide). Learning flows upward at wrap, general items one user approval each. Claude Code's auto-memory is off in project-time repos (2026-10-19; replaces `~/.claude/project-lessons.md`) | Lessons about the user or their tools outlive the project. Auto-memory is scoped per directory, so it can't carry them, and running it next to `docs/` memory put the same rules in two places that drifted apart. |
 | 18 | `docs/memory/overview.md` is updated at every wrap | Once the first spec is archived, something live has to describe the system as a whole for the next feature's spec. |
 | 19 | Cycle type is inferred, not asked: `project` when the repo is blank (no archive, no tracked files outside `docs/`, `AGENTS.md`, `CLAUDE.md`, `README*`, `LICENSE*` and dotfiles), `feature` otherwise. The router states it and the user can override | Saves a question in the common case. Looking at the code, not only at memory, keeps an existing codebase that adopts the workflow from being mistaken for a new project. The override covers a large rewrite, which needs a project-depth spec. |
 
@@ -74,17 +74,17 @@ docs/
     recap.md                   written at wrap, archived with the rest
   archive/
     <YYYY-MM-DD>-<slug>/       wrapped cycles: spec, plan, cycle memory, recap
-~/.claude/project-lessons.md   global, cross-project lessons
+~/.agents/memory/             general level, machine-wide: INDEX.md + area files (lessons.md)
 ```
 
 Archive folders are named by date and slug, not by number, because numbers would collide across parallel branches.
 
 ## The AGENTS.md block
 
-Written by setup between `<!-- project-time:start v3 -->` and `<!-- project-time:end -->`. Version 2 adds the full commit list, the pin line format and the no-cycle pin rule. Version 3 (2026-10-19) adds the auto-memory routing rule: repo decisions, pins and working rules stay in `docs/`, so they aren't also copied into Claude Code's per-directory auto-memory and left to drift. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
+Written by setup between `<!-- project-time:start v4 -->` and `<!-- project-time:end -->`. Version 2 adds the full commit list, the pin line format and the no-cycle pin rule. Version 3 (2026-10-19) adds the auto-memory routing rule: repo decisions, pins and working rules stay in `docs/`, so they aren't also copied into Claude Code's per-directory auto-memory and left to drift. Version 4 (2026-10-19) names the three levels (cycle, project, general at `~/.agents/memory/`), reads the general index at session start, says how learning flows up at wrap, and turns Claude Code's auto-memory off in the repo. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
 
 - The docs layout above, in brief.
-- At session start: read `docs/memory/INDEX.md`, and if `docs/current/` exists, `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`.
+- At session start: read `~/.agents/memory/INDEX.md` and `docs/memory/INDEX.md`, and if `docs/current/` exists, `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`.
 - Memory rules: when to write, entry format, ID scheme, supersede instead of delete, cycle overrides project, pins go straight to the index.
 - "Pin this" or "remember this" from the user creates a pinned entry immediately.
 - Write memory only to `docs/current/memory/`. Project memory changes only at wrap.
@@ -94,9 +94,9 @@ Written by setup between `<!-- project-time:start v3 -->` and `<!-- project-time
 
 ## Memory
 
-**Levels.** Global lessons, project memory, cycle memory. During a cycle the agent reads project and cycle memory and writes only cycle memory.
+**Levels.** General (`~/.agents/memory/`), project (`docs/memory/`), cycle (`docs/current/memory/`), each an `INDEX.md` plus area files. During a cycle the agent reads all three and writes only cycle memory, except that "remember this for every project" goes straight to general.
 
-**Read order.** At session start: both indexes. On demand: area files from either level that relate to the work at hand. When the two disagree, the cycle wins while it is active. Global lessons are read by `project-spec` and `project-plan` only.
+**Read order.** At session start: the three indexes (Claude also loads the general one everywhere through `~/.claude/CLAUDE.md`). On demand: area files from any level that relate to the work at hand. When levels disagree, the more specific wins: cycle, then project, then general.
 
 **Index format.** Each index holds three things, and nothing else:
 
@@ -261,7 +261,7 @@ When pausing mid-step, or after notable progress inside a long step, update the 
    - Takeaways: what worked, what to do differently.
    Follows `human-write-time` and the user's `VOICE.md` when installed.
 3. **Consolidate** cycle memory into project memory: decisions that still stand, discoveries that matter beyond this cycle, overrides applied to the project entries they supersede, cycle pins the user marks as project-wide. Update `overview.md`. Feature-local detail stays in the archive.
-4. **Promote lessons.** Propose the takeaways that look cross-project; append the ones the user approves to `~/.claude/project-lessons.md`, one line each with project and date, same lean-index style.
+4. **Promote to general.** Propose what holds beyond the repo (lessons, facts about the user, pins marked every project); write the ones the user approves to `~/.agents/memory/`, lessons one line each with project and date, preferences as general pins.
 5. **Archive.** Move `docs/current/` to `docs/archive/<YYYY-MM-DD>-<slug>/` and commit.
 
 Can also run as an interim recap mid-cycle, which writes the recap only and skips steps 3 to 5.

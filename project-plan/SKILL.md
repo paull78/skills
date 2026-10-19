@@ -15,7 +15,7 @@ Follow the conventions in the project-time block of `AGENTS.md`. If `docs/curren
 
 ## 1. Read
 
-The spec, both memory indexes and the area files relevant to the work, `~/.claude/project-lessons.md` if it exists, and the codebase layout. If `plan/INDEX.md` exists as a draft, resume from it.
+The spec, the three memory indexes (general, project, cycle) and the area files relevant to the work at every level, general lessons included, and the codebase layout. If `plan/INDEX.md` exists as a draft, resume from it.
 
 ## 2. Milestone outline
 

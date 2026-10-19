@@ -13,7 +13,7 @@ Follow the conventions in the project-time block of `AGENTS.md`. If the plan is 
 
 ## 1. Resume
 
-Read `plan/INDEX.md`, both memory indexes and their pinned items. Compare the spec's `Branch:` with the current branch; if they differ, invoke `project-time`. Then reconcile three sources:
+Read `plan/INDEX.md` and the three memory indexes (general, project, cycle) with their pinned items. Compare the spec's `Branch:` with the current branch; if they differ, invoke `project-time`. Then reconcile three sources:
 
 - the **INDEX**: `Current:`, the marks, Last stop;
 - **git log**: `git log --oneline --grep '^<slug> step [0-9]'`;

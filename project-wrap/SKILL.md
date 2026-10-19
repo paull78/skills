@@ -1,17 +1,17 @@
 ---
 name: project-wrap
-description: Close a project-time cycle with a final gate, a recap distilled from memory and plan, consolidation of cycle memory into project memory and the overview, promotion of approved cross-project lessons, and archiving of docs/current. Also writes interim recaps mid-cycle. Use when /project-time hands off to it, all plan steps are done, or the user wants to wrap up, finish or close the cycle, write takeaways, or get a recap of where the project stands.
+description: Close a project-time cycle with a final gate, a recap distilled from memory and plan, promotion of cycle memory into project memory and the overview, promotion of approved items to general (machine-wide) memory, and archiving of docs/current. Also writes interim recaps mid-cycle. Use when /project-time hands off to it, all plan steps are done, or the user wants to wrap up, finish or close the cycle, write takeaways, or get a recap of where the project stands.
 ---
 
 # Project Wrap
 
-Closes a cycle. Turns what's scattered across memory and plan into a recap a person can read, moves what's worth keeping into project memory, and archives the rest.
+Closes a cycle. Turns what's scattered across memory and plan into a recap a person can read, moves what's worth keeping up a level (cycle to project, then project to general), and archives the rest.
 
 Follow the conventions in the project-time block of `AGENTS.md`. If `docs/current/` is missing, there's nothing to wrap: say so.
 
 **Modes.** Every step `[x]`, or `Current:` starts with `wrap` → full wrap. Otherwise, or when the user asks for "a recap" or "where do we stand" → interim recap: write section 2 only, commit only `recap.md` as `<slug>: interim recap`, and stop. If the user explicitly asks to close the cycle with steps left, list them, write a `decision` entry, and run the full wrap; the open steps go under Open issues in the recap.
 
-Track progress in the plan INDEX `Current:`: `wrap: gate passed`, `wrap: recap written`, `wrap: memory consolidated`, `wrap: lessons done`. On entry, continue from the first unfinished section. Never copy an entry whose ID already exists in `docs/memory/`, and never append a lesson already in the file.
+Track progress in the plan INDEX `Current:`: `wrap: gate passed`, `wrap: recap written`, `wrap: memory consolidated`, `wrap: general done`. On entry, continue from the first unfinished section. Never copy an entry whose ID already exists in `docs/memory/`, and never add a line already in general memory.
 
 ## 1. Final gate
 
@@ -56,7 +56,7 @@ Go through cycle memory entry by entry and sort each one:
 
 - **Promote:** decisions that still stand and constrain future work; discoveries that matter beyond this cycle; pivots that change a project-level entry.
 - **Archive only:** detail that mattered only inside this cycle.
-- **Cycle pins:** ask about each one, project-wide or done with.
+- **Cycle pins:** ask about each one: project-wide, every project (it goes to section 4), or done with.
 
 Show the user the sorted list and ask for OK. Then:
 
@@ -65,19 +65,21 @@ Show the user the sorted list and ask for OK. Then:
 3. Move approved pins under `## Pinned` in `docs/memory/INDEX.md`.
 4. Rewrite `docs/memory/overview.md` to describe the system as it is now: what it is, its main parts and where they live, how to run and test it, the key decision IDs. Under a page.
 
-## 4. Promote lessons
+## 4. Promote to general memory
 
-Some takeaways are about the user, their tools or their way of working, not this project: "library X breaks on scanned PDFs", "milestones of three to five steps worked best". Propose these as a numbered list and let the user approve each one. Append the approved ones to `~/.claude/project-lessons.md`, creating it with the header below if missing, one line each:
+The general level is `~/.agents/memory/`: machine-wide, read in every project, never committed. Only what holds beyond this repo goes there, and only if it will be useful elsewhere:
 
-```markdown
-# Project lessons
+- **lessons** about tools, process or the way of working: "library X breaks on scanned PDFs", "milestones of three to five steps worked best";
+- **facts about the user** that hold in every project: a preference, a habit, a standing rule;
+- cycle pins the user marked "every project" in section 3.
 
-Cross-project lessons, approved one by one when a cycle wraps. Read by project-spec and project-plan.
+Look at this cycle's takeaways and at the entries just promoted to project memory. Propose the candidates as a numbered list and let the user approve each one. Then:
 
-- <YYYY-MM-DD> · <repo>/<slug> · <lesson>
-```
+1. Add each approved lesson as one line to the matching area file, `lessons.md` by default: `- <YYYY-MM-DD> · <repo>/<slug> · <lesson>`.
+2. Add each approved preference or standing rule under `## Pinned` in `~/.agents/memory/INDEX.md`, as `- <the rule> (<repo>/<slug>, <YYYY-MM-DD>)`.
+3. When an area file passes about 100 lines, split it by topic and add each new area's line to the INDEX.
 
-When the file passes about 100 lines, group the lines under topic headings.
+Create `~/.agents/memory/INDEX.md` from the project-time template if it's missing.
 
 ## 5. Archive
 

@@ -13,12 +13,12 @@ for f in spec.md plan/INDEX.md memory/INDEX.md recap.md; do assert_file "$arch/$
 for h in 'What was built' 'How it went' 'Decisions that stand' 'Takeaways'; do assert_grep "$arch/recap.md" "^## $h"; done
 grep -q 'empty until the first cycle wraps' docs/memory/overview.md && fail "overview not rewritten"
 grep -rqE '^### wordfreq\.[0-9]+' docs/memory || fail "no entries promoted to project memory"
-# ~/.claude is a protected path: headless runs can't write it, so the skill hands the line to the user instead.
+# General memory is outside the repo: a headless run may be refused the write, so the skill hands the line to the user instead.
 if [ -f "$LESSONS" ]; then
   grep 'wordfreq' "$LESSONS" >/dev/null || fail "approved lesson not written"
   [ "$(grep -c 'wordfreq' "$LESSONS")" -le 1 ] || fail "more than the one approved lesson written"
 else
-  grep 'project-lessons.md' <<< "$LAST" >/dev/null || fail "approved lesson neither written nor handed to the user"
+  grep 'lessons.md' <<< "$LAST" >/dev/null || fail "approved lesson neither written nor handed to the user"
 fi
 assert_last_commit '^wordfreq: wrap'
 assert_clean_tree

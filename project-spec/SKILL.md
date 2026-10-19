@@ -13,7 +13,7 @@ Follow the conventions in the project-time block of `AGENTS.md` (layout, memory 
 
 ## 1. Before the first question
 
-- Read the spec header (`Type:`), the whole spec if resuming, both memory indexes, and `~/.claude/project-lessons.md` if it exists. Apply relevant lessons, and say so when one shapes a recommendation.
+- Read the spec header (`Type:`), the whole spec if resuming, the three memory indexes (general, project, cycle) and the general area files that relate to the work, lessons included. Apply what's relevant, and say so when a general entry shapes a recommendation.
 - If the repo has code: read `docs/memory/overview.md`, then explore the parts of the codebase the work touches. Never ask what the repo already answers.
 - **Resuming:** say in two lines where things stand, then continue from the first item under Open questions. If Open questions is `- none`, go to section 3.
 - **New:** ask the user to describe the project or feature in their own words, unless they already have.

@@ -7,28 +7,40 @@ description: Entry point for the project workflow. Sets up the docs folder and s
 
 The front door of the project workflow. It makes sure the repo is set up, then hands off to the phase skill that owns the current state. It never does a phase's work itself.
 
-Every piece of work is a **cycle**: the first build of a new project, or a feature. A cycle lives in `docs/current/` on its own branch and goes spec → plan → build → wrap, with a gate at each main point. Decisions, discoveries, pivots, issues and pins go into a hierarchical memory. The files on disk are the source of truth, so any session resumes by running `/project-time`.
+Every piece of work is a **cycle**: the first build of a new project, or a feature. A cycle lives in `docs/current/` on its own branch and goes spec → plan → build → wrap, with a gate at each main point. Decisions, discoveries, pivots, issues and pins go into a memory with three levels, from specific to general:
+
+```
+general   ~/.agents/memory/      every project on this machine
+   ▲  at wrap, only what holds everywhere; the user approves each item
+project   docs/memory/           this repo, in git
+   ▲  at wrap: each entry promoted or archived
+cycle     docs/current/memory/   the feature being built now
+```
+
+Every level has the same shape: an `INDEX.md` with `## Pinned` and one line per area, plus area files. Learning flows upward only, and only when it's useful beyond its level. Where levels disagree, the more specific one wins. The files on disk are the source of truth, so any session resumes by running `/project-time`.
 
 | Phase skill | Owns |
 |---|---|
 | `project-spec` | the interview, `docs/current/spec.md`, Gate 0, spec amendments |
 | `project-plan` | `docs/current/plan/`, Gate 1, plan updates |
 | `project-build` | steps, progress, milestone gates, parallel runs |
-| `project-wrap` | final gate, recap, memory consolidation, lessons, archive |
+| `project-wrap` | final gate, recap, promotion to project and general memory, archive |
 
 ## 1. Setup check
 
 Run on every invocation. Each check is cheap; write only what is missing or outdated.
 
 1. **Git.** `git rev-parse --is-inside-work-tree`. Not a repo: offer `git init`. If the user declines, carry on and skip every commit in the workflow.
-2. **AGENTS.md block.** Look for `<!-- project-time:start v3 -->` … `<!-- project-time:end -->`.
+2. **AGENTS.md block.** Look for `<!-- project-time:start v4 -->` … `<!-- project-time:end -->`.
    - No block: append the block from the Templates section, creating `AGENTS.md` if needed.
    - Older version marker, or text that differs from the template: replace everything between the markers, markers included.
    - Identical: leave it alone.
 3. **CLAUDE.md import.** Claude Code ignores `AGENTS.md` when a `CLAUDE.md` exists, so `CLAUDE.md` must import it. No file: create it containing `@AGENTS.md`. File without an `@AGENTS.md` line: append one.
 4. **Project memory.** Create `docs/memory/INDEX.md` and `docs/memory/overview.md` from the templates if missing. Leave any other `docs/` content alone. If one of these paths exists but isn't ours, ask; never overwrite.
+5. **Auto-memory off.** In a project-time repo the three levels replace Claude Code's per-folder auto-memory. Set `"autoMemoryEnabled": false` in `.claude/settings.json`, creating the file or merging the key into it. If the auto-memory folder for this repo (`~/.claude/projects/<path with / as ->/memory/`) holds entries, show them and propose a home for each: project memory (repo facts, machine facts such as ports included), general memory (facts about the user or their tools), or drop. Write the approved ones, then empty that folder.
+6. **General memory.** Machine-wide, outside the repo, not committed. Create `~/.agents/memory/INDEX.md` from the template if missing. If `~/.claude/project-lessons.md` exists (the old general file), move its lines into `~/.agents/memory/lessons.md`, add the area to the INDEX, and delete the old file. Make sure `~/.claude/CLAUDE.md` has the line `@~/.agents/memory/INDEX.md`, creating the file if needed, so Claude loads the general level in every session.
 
-If anything was written, commit only those files as `project-time: setup`.
+If anything in the repo was written, commit only those files as `project-time: setup`.
 
 ## 2. Route
 
@@ -60,23 +72,31 @@ If the user asks for something specific, route to its owner instead: "reopen" or
 
 ## Templates
 
-### AGENTS.md block (v3)
+### AGENTS.md block (v4)
 
 ```markdown
-<!-- project-time:start v3 -->
+<!-- project-time:start v4 -->
 ## Project workflow (project-time)
 
 This repo runs the project-time workflow. Its state lives in `docs/`: the files are the source of truth, the conversation is scratch.
 
-- `docs/memory/`: project memory. Read it; setup creates it and only `project-wrap` changes it.
-- `docs/current/`: the active cycle on this branch. `spec.md`, `plan/INDEX.md` with `plan/step-NN-*.md`, and `memory/` (cycle memory).
-- `docs/archive/<date>-<slug>/`: finished cycles.
+**Memory has three levels**, from specific to general. Each has an `INDEX.md` (`## Pinned`, then one line per area) and area files.
 
-**Session start.** Read `docs/memory/INDEX.md`. If `docs/current/` exists, also read `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`. Open area files only when they relate to the work at hand.
+| Level | Where | Holds | Changed |
+|---|---|---|---|
+| cycle | `docs/current/memory/` | the feature being built on this branch | as things happen |
+| project | `docs/memory/` | what holds for this repo: code, product, working rules, this machine's setup | only by `project-wrap` (and setup, moving old auto-memory in) |
+| general | `~/.agents/memory/` | what holds in every project: the user, their tools, lessons | at wrap, each item approved by the user, or when the user asks to remember something for every project |
 
-**Memory.** Record in `docs/current/memory/` as soon as it happens, before moving on:
+The rest of `docs/`: `docs/current/` is the active cycle (`spec.md`, `plan/INDEX.md` with `plan/step-NN-*.md`, `memory/`); `docs/archive/<date>-<slug>/` holds finished cycles.
+
+**Session start.** Read `~/.agents/memory/INDEX.md` and `docs/memory/INDEX.md`. If `docs/current/` exists, also read `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`. Open area files only when they relate to the work at hand. Where levels disagree, the more specific wins: cycle, then project, then general. Pins from all three apply.
+
+**Recording.** Write to the cycle level as soon as it happens, before moving on:
 - a decision (with the why and the rejected options), a discovery, a pivot, an issue;
-- anything the user asks to pin or remember: a one-liner under `## Pinned` in the cycle memory INDEX, as `- <slug>.<NN> · <the rule>`. With no active cycle, a pin waits for the next cycle: say so.
+- anything the user asks to pin or remember: a one-liner under `## Pinned` in the cycle INDEX, as `- <slug>.<NN> · <the rule>`. With no active cycle, a pin waits for the next cycle: say so.
+
+When the user asks to remember something for every project, write it to the general level at once, as a pin or a line in an area file. Nothing else skips a level.
 
 Entries go in area files by topic, each area listed in one line in the INDEX:
 
@@ -84,16 +104,31 @@ Entries go in area files by topic, each area listed in one line in the INDEX:
     <the fact>
     **Why:** <reason; rejected options>
 
-NN is the highest number in the cycle plus one, pins included. Never delete an entry. A pivot adds a new entry marked `Supersedes <id>` and appends `Superseded by <id>` to the old one. If the old one is in project memory, add `- <old> → <new> · <one line>` under `## Overrides` in the cycle INDEX instead. Cycle memory wins over project memory while the cycle is active. Pins from both indexes apply.
+NN is the highest number in the cycle plus one, pins included. Never delete an entry. A pivot adds a new entry marked `Supersedes <id>` and appends `Superseded by <id>` to the old one. If the old one is in project memory, add `- <old> → <new> · <one line>` under `## Overrides` in the cycle INDEX instead.
 
-**Claude Code auto-memory.** Decisions, pins and working rules for this repo go in `docs/` memory as above, and cross-project lessons in `~/.claude/project-lessons.md` at wrap, never in Claude Code's auto-memory. Auto-memory holds only facts about this machine (ports, running servers, local paths) and facts about the user that hold in every repo.
+**Flowing up.** At wrap, each cycle entry is promoted to project memory or archived with the cycle. Then whatever holds beyond this repo is proposed for the general level, one item at a time. Only promote what will be useful at the higher level.
 
-**Commits.** The workflow commits at setup, cycle start, gates, each finished build step, spec amendments, plan updates, parallel-run start and record, interim recaps, and wrap, each with only the files that step touched. Messages start with `<slug>:` or `<slug> step NN:`. Never push, and never merge a feature branch into the default branch.
+**Claude Code auto-memory is off** in this repo (`.claude/settings.json`): everything goes to one of the three levels.
 
-**Sub-agents** never write under `docs/`. They report back; the main agent records.
+**Commits.** The workflow commits at setup, cycle start, gates, each finished build step, spec amendments, plan updates, parallel-run start and record, interim recaps, and wrap, each with only the files that step touched. Messages start with `<slug>:` or `<slug> step NN:`. Never push, and never merge a feature branch into the default branch. The general level lives outside the repo and is never committed.
+
+**Sub-agents** never write under `docs/` or in `~/.agents/memory/`. They report back; the main agent records.
 
 **To continue work,** run `/project-time`.
 <!-- project-time:end -->
+```
+
+### ~/.agents/memory/INDEX.md
+
+```markdown
+# Memory: general
+
+Machine-wide memory for every project: the user, their tools, lessons from finished cycles. Changed at wrap, one approved item at a time, or when the user asks to remember something for every project.
+
+## Pinned
+
+## Areas
+- lessons.md · lessons from finished cycles, one line each: `- <YYYY-MM-DD> · <repo>/<slug> · <lesson>`
 ```
 
 ### docs/memory/INDEX.md

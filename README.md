@@ -36,7 +36,7 @@ npx skills add paull78/skills --list
 
 ### Project workflow
 
-A spec → plan → build → wrap cycle for a new project or a single feature, with a hierarchical memory of decisions, discoveries, pivots and pins, and progress on disk that survives context resets. You type `/project-time`; it sets the repo up on first run and continues wherever the work stands.
+A spec → plan → build → wrap cycle for a new project or a single feature, with a three-level memory (cycle, project, general) of decisions, discoveries, pivots and pins, and progress on disk that survives context resets. You type `/project-time`; it sets the repo up on first run and continues wherever the work stands.
 
 | Skill | Description |
 |-------|-------------|
@@ -44,7 +44,7 @@ A spec → plan → build → wrap cycle for a new project or a single feature, 
 | [project-spec](./project-spec) | One-question-at-a-time interview written to the spec as it goes, optional challenge round, approval gate, amend mode. |
 | [project-plan](./project-plan) | Milestones as vertical slices, self-contained step files with tests first, parallel-safe groups, a gate per milestone. |
 | [project-build](./project-build) | Resumable step loop: tests first, real verification, memory checkpoints, a commit per step, parallel steps in worktrees. |
-| [project-wrap](./project-wrap) | Final gate, recap from memory, consolidation into project memory, approved cross-project lessons, archive. |
+| [project-wrap](./project-wrap) | Final gate, recap from memory, promotion up the three memory levels (cycle → project → general, general items approved one by one), archive. |
 
 Install all five:
 
