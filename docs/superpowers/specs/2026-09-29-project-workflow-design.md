@@ -81,7 +81,7 @@ Archive folders are named by date and slug, not by number, because numbers would
 
 ## The AGENTS.md block
 
-Written by setup between `<!-- project-time:start v2 -->` and `<!-- project-time:end -->`. Version 2 adds the full commit list, the pin line format and the no-cycle pin rule. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
+Written by setup between `<!-- project-time:start v3 -->` and `<!-- project-time:end -->`. Version 2 adds the full commit list, the pin line format and the no-cycle pin rule. Version 3 (2026-10-19) adds the auto-memory routing rule: repo decisions, pins and working rules stay in `docs/`, so they aren't also copied into Claude Code's per-directory auto-memory and left to drift. Every `/project-time` run checks the marker: missing means write it, mangled means repair it, older version means upgrade it. About 30 lines covering:
 
 - The docs layout above, in brief.
 - At session start: read `docs/memory/INDEX.md`, and if `docs/current/` exists, `docs/current/memory/INDEX.md` and `docs/current/plan/INDEX.md`.

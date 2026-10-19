@@ -21,7 +21,7 @@ Every piece of work is a **cycle**: the first build of a new project, or a featu
 Run on every invocation. Each check is cheap; write only what is missing or outdated.
 
 1. **Git.** `git rev-parse --is-inside-work-tree`. Not a repo: offer `git init`. If the user declines, carry on and skip every commit in the workflow.
-2. **AGENTS.md block.** Look for `<!-- project-time:start v2 -->` … `<!-- project-time:end -->`.
+2. **AGENTS.md block.** Look for `<!-- project-time:start v3 -->` … `<!-- project-time:end -->`.
    - No block: append the block from the Templates section, creating `AGENTS.md` if needed.
    - Older version marker, or text that differs from the template: replace everything between the markers, markers included.
    - Identical: leave it alone.
@@ -60,10 +60,10 @@ If the user asks for something specific, route to its owner instead: "reopen" or
 
 ## Templates
 
-### AGENTS.md block (v2)
+### AGENTS.md block (v3)
 
 ```markdown
-<!-- project-time:start v2 -->
+<!-- project-time:start v3 -->
 ## Project workflow (project-time)
 
 This repo runs the project-time workflow. Its state lives in `docs/`: the files are the source of truth, the conversation is scratch.
@@ -85,6 +85,8 @@ Entries go in area files by topic, each area listed in one line in the INDEX:
     **Why:** <reason; rejected options>
 
 NN is the highest number in the cycle plus one, pins included. Never delete an entry. A pivot adds a new entry marked `Supersedes <id>` and appends `Superseded by <id>` to the old one. If the old one is in project memory, add `- <old> → <new> · <one line>` under `## Overrides` in the cycle INDEX instead. Cycle memory wins over project memory while the cycle is active. Pins from both indexes apply.
+
+**Claude Code auto-memory.** Decisions, pins and working rules for this repo go in `docs/` memory as above, and cross-project lessons in `~/.claude/project-lessons.md` at wrap, never in Claude Code's auto-memory. Auto-memory holds only facts about this machine (ports, running servers, local paths) and facts about the user that hold in every repo.
 
 **Commits.** The workflow commits at setup, cycle start, gates, each finished build step, spec amendments, plan updates, parallel-run start and record, interim recaps, and wrap, each with only the files that step touched. Messages start with `<slug>:` or `<slug> step NN:`. Never push, and never merge a feature branch into the default branch.
 
