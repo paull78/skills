@@ -36,39 +36,10 @@ npx skills add paull78/skills --list
 
 ### Project workflow
 
-A spec → plan → build → wrap cycle for a new project or a single feature, with a three-level memory (cycle, project, general) of decisions, discoveries, pivots and pins, and progress on disk that survives context resets. You type `/project-time`; it sets the repo up on first run and continues wherever the work stands.
-
-| Skill | Description |
-|-------|-------------|
-| [project-time](./project-time) | Entry point. Sets up `docs/`, a standing-rules block in `AGENTS.md`, the general memory in `~/.agents/memory/`, turns Claude Code's auto-memory off in the repo, and routes to the phase that owns the current state. |
-| [project-spec](./project-spec) | One-question-at-a-time interview written to the spec as it goes, optional challenge round, approval gate, amend mode. |
-| [project-plan](./project-plan) | Milestones as vertical slices, self-contained step files with tests first, parallel-safe groups, a gate per milestone. |
-| [project-build](./project-build) | Resumable step loop: tests first, real verification, memory checkpoints, a commit per step, parallel steps in worktrees. |
-| [project-wrap](./project-wrap) | Final gate, recap from memory, promotion up the three memory levels (cycle → project → general, general items approved one by one), archive. |
-
-#### Memory
-
-Three levels, from specific to general, each an `INDEX.md` (pinned rules, one line per area) plus area files:
-
-```
-general   ~/.agents/memory/      every project on this machine: the user, their tools, lessons
-   ▲  at wrap, only what holds everywhere; the user approves each item
-project   docs/memory/           this repo, in git: code, product, working rules
-   ▲  at wrap: each cycle entry promoted or archived
-cycle     docs/current/memory/   the feature being built now, written as things happen
-```
-
-- Learning flows upward only, at wrap, and only when it's useful at the higher level. "Remember this for every project" goes straight to general.
-- Every session reads the three indexes; where they disagree, the more specific wins (cycle, then project, then general).
-- In a project-time repo, Claude Code's per-folder auto-memory is turned off (`"autoMemoryEnabled": false` in `.claude/settings.json`), so each fact has one home. Other repos keep Claude's default memory.
-- `~/.claude/CLAUDE.md` imports `~/.agents/memory/INDEX.md`, so the general level applies in every Claude session. Older setups' `~/.claude/project-lessons.md` is moved into `~/.agents/memory/lessons.md` by setup.
-
-Install all five:
+The project workflow skills (`project-time`, `project-spec`, `project-plan`, `project-build`, `project-wrap`) now live in their own repo, **[paull78/project-time](https://github.com/paull78/project-time)**: a spec → plan → build → wrap cycle with gates you approve and a three-level memory that survives context resets.
 
 ```bash
-for s in project-time project-spec project-plan project-build project-wrap; do
-  npx skills add paull78/skills --skill "$s" --global
-done
+npx skills add paull78/project-time --skill '*' --global
 ```
 
 ### Architecture Knowledge
