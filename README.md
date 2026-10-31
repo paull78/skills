@@ -2,6 +2,18 @@
 
 Personal Claude Code skills collection.
 
+## explain-time
+
+When you build with an agent the cycles are tight, and cycle after cycle the session's context fills up with implementation details. Little by little you lose the grasp of the code structure and the architecture, and asking the working agent to explain them spends the context it needs for the work. explain-time moves those questions to a second chat.
+
+The second chat is read only on the code. It knows another agent is editing the same files, so a half-written function, or a test that fails because its code doesn't exist yet, doesn't confuse it. Ask it how the architecture fits together, how an algorithm works, what a feature does, or why you see a particular behaviour. It answers in simple terms, without acronyms, with a small diagram when it helps. When you want to keep an answer, it writes a short report to `~/.agents/explain/<repo>/`, outside the repo.
+
+```bash
+npx skills add paull78/skills --skill explain-time --global
+```
+
+Open a second session in the same repo, type `/explain-time` and ask.
+
 ## Install
 
 Uses the [`skills`](https://github.com/vercel-labs/skills) CLI.
@@ -30,7 +42,6 @@ npx skills add paull78/skills --list
 | [instrument-time](./instrument-time) | Instrument code to gain eyes on its runtime behavior, then iterate against that real signal to fix the bug or hit the goal. For hard, multi-attempt problems — stubborn bugs, flaky tests, performance tuning — where editing blind wastes attempts. |
 | [review-time](./review-time) | Multi-agent code review — dispatches diff to Claude, Codex, Copilot in parallel, aggregates findings with consensus scoring. |
 | [comment-time](./comment-time) | Audit comments for necessity, brevity, non-triviality, clarity, accuracy, and rot. Scope: repo, branch diff, changed files, or current file. |
-| [explain-time](./explain-time) | Write a top-down explanatory document about a system or subsystem for a reader who knows code but not the domain. Jargon defined inline, real walk-throughs, file:line citations, glossary. |
 | [save-time](./save-time) | Write a markdown recap of the current conversation so the work can be resumed later. Captures decisions and their rationale, plans in flight, gotchas, pitfalls, and where things stand. Omits anything obvious from the code or git history. |
 | [human-write-time](./human-write-time) | Write prose that doesn't read as AI-generated, and de-slop drafts that do. Hard-bans negative parallelism, dead AI vocabulary, em dashes, participle padding; loads an optional `VOICE.md` so the result sounds like the author rather than a house style. Ideas from [humanizer](https://github.com/blader/humanizer) by [blader](https://github.com/blader). |
 
