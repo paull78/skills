@@ -34,9 +34,6 @@ npx skills add paull78/skills --list
 
 | Skill | Description |
 |-------|-------------|
-| [question-time](./question-time) | Relentless Socratic interrogation of plans and designs. Inspired by [grill-me](https://github.com/mattpocock/skills/tree/main/grill-me) by [Matt Pocock](https://github.com/mattpocock). |
-| [prd-time](./prd-time) | PRD creation with architecture selection, codebase exploration, and relentless questioning. Inspired by [write-a-prd](https://github.com/mattpocock/skills/tree/main/write-a-prd) by [Matt Pocock](https://github.com/mattpocock). |
-| [task-time](./task-time) | Break a PRD into independent, parallelizable task files with TDD where appropriate and a final reconciliation task. |
 | [test-time](./test-time) | Write or strengthen a test suite with aggressive bug-hunting — black-box via public APIs, guided fuzzing, invariants over fixed outputs, reference oracles, threshold corner cases, malformed inputs, stress testing. Derives expected results from the spec, never the running code. |
 | [test-verify-time](./test-verify-time) | Full test quality assessment after all tasks complete — checks behavior focus, edge cases, pyramid balance, independence, and brittleness. |
 | [instrument-time](./instrument-time) | Instrument code to gain eyes on its runtime behavior, then iterate against that real signal to fix the bug or hit the goal. For hard, multi-attempt problems — stubborn bugs, flaky tests, performance tuning — where editing blind wastes attempts. |
@@ -55,7 +52,7 @@ npx skills add paull78/project-time --skill '*' --global
 
 ### Architecture Knowledge
 
-Composable lenses for challenging designs against established principles. Use standalone or loaded by question-time.
+Composable lenses for challenging designs against established principles. Use standalone or in the challenge round of [project-spec](https://github.com/paull78/project-time).
 
 | Skill | Source |
 |-------|--------|
