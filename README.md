@@ -2,6 +2,10 @@
 
 Personal skills for Claude Code and other coding agents.
 
+An agent can solve a problem from several angles, and the job is to understand them and pick the one you can maintain. These skills help you keep control of the resulting code and steer the agent where you want.
+
+Frontier agents can already do most of this when you ask. These skills write the behaviour down, so you don't have to ask every time, and a smaller, cheaper model gets the same instructions to follow.
+
 ## Install
 
 Skills install with the [`skills`](https://github.com/vercel-labs/skills) CLI:
@@ -28,6 +32,8 @@ When you build with an agent the cycles are tight, and cycle after cycle the ses
 
 ### Testing and debugging
 
+Make the agent look for bugs in its own work, and see what the code does when it runs.
+
 | Skill | What it does |
 |-------|--------------|
 | [test-time](./test-time) | Writes or strengthens a test suite that goes looking for bugs: tests through the public API, random and malformed inputs, rules that must always hold, comparison with a reference implementation, corner cases at thresholds and stress runs. Expected results come from the spec, never from the running code. |
@@ -36,12 +42,16 @@ When you build with an agent the cycles are tight, and cycle after cycle the ses
 
 ### Reviewing code
 
+Check what the agent wrote before you merge.
+
 | Skill | What it does |
 |-------|--------------|
 | [review-time](./review-time) | Sends the same diff to Claude, Codex and Copilot in parallel, then merges the findings into one report that shows who found what and how many agents agree. |
 | [comment-time](./comment-time) | Checks that comments are necessary, brief, clear and accurate, that they say something the code doesn't, and that they aren't out of date. Runs on the whole repo, a branch diff, the changed files or a single file. |
 
 ### Writing and handing off
+
+Keep your own voice in the text, and stop and resume the work when you want.
 
 | Skill | What it does |
 |-------|--------------|
@@ -50,13 +60,15 @@ When you build with an agent the cycles are tight, and cycle after cycle the ses
 
 ### Design
 
+Tell the agent how a canvas editor should behave.
+
 | Skill | What it does |
 |-------|--------------|
 | [cad-ux-time](./cad-ux-time) | Interaction design for CAD, drawing and floor-plan editors in the browser, with 18 laws, starting numbers and four modes: design, build, review and audit. References cover tools and typed input, snapping, selection, navigation, refusals, collaboration and undo, panels, canvas accessibility and plan drawing conventions. Distilled from tldraw, Figma, AutoCAD, SketchUp, Onshape, NN/g and WCAG 2.2. Ideas from [ux-designer-skill](https://github.com/szilu/ux-designer-skill), [web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines), [Emil Kowalski's skills](https://github.com/emilkowalski/skills), [impeccable](https://github.com/pbakaus/impeccable) and [interface-design](https://github.com/Dammyjay93/interface-design). |
 
 ### Architecture lenses
 
-Each lens challenges a design against the principles of one source. Use one or several on their own, or pick them in the challenge round of [project-spec](https://github.com/paull78/project-time).
+You choose the principles and the agent tests a design against them. Use one or several on their own, or in the challenge round of [project-spec](https://github.com/paull78/project-time).
 
 | Skill | Source | What it looks at |
 |-------|--------|------------------|
